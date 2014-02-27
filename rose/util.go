@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func fatal(s string) {
+func fatal(src string, ix int, s string) {
 	fmt.Printf("rose: %s\n", s)
 	panic(s)
 }
