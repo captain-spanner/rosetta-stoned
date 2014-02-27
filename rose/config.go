@@ -9,5 +9,8 @@ func configure() {
 	if err != nil {
 		fatal(Config, 0, "open config failed")
 	}
-	_ = sf
+	defer sf.Close()
+	vect := readlines(sf)
+	vargs := wordlists(vect)
+	_, _, _ = Run_cmds(vargs, Config, true)
 }

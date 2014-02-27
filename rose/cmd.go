@@ -50,8 +50,22 @@ func run_cmdx(argc int, args []string, src string, ix int, die bool) (ret []stri
 		cmd_echo(argc, args, src, 0, die)
 	}
 	cmd := args[0]
-	argc--
-	args = args[1:]
+	set := false
+	if len(cmd) >= 2 {
+		if cmd[0] == '#' {
+			args[0] = cmd[1:]
+			cmd = "#"
+			set = true
+		} else if len(cmd) >=3 && cmd[0:2] == "//" {
+			args[0] = cmd[2:]
+			cmd = "//"
+			set = true
+		}
+	}
+	if !set {
+		argc--
+		args = args[1:]
+	}
 	cmdf, found := cmdtab[cmd]
 	if !found {
 		mesg := cmd + ": unknown command"
@@ -95,5 +109,13 @@ func cmd_help(argc int, args []string, src string, ix int, die bool) ([]string, 
 }
 
 func cmd_root(argc int, args []string, src string, ix int, die bool) ([]string, int) {
+	if root != "" {
+		diagx("root already set", src, ix, die)
+		return none, 1
+	}
+	root = args[0]
+	if verbose {
+		fmt.Printf("root = %q\n", root)
+	}
 	return none, 0
 }
