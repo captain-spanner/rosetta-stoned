@@ -12,5 +12,5 @@ func configure() {
 	defer sf.Close()
 	vect := readlines(sf)
 	vargs := wordlists(vect)
-	_, _, _ = Run_cmds(vargs, Config, true)
+	Run_cmds(vargs, Config, true)
 }

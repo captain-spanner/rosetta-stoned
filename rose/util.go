@@ -3,12 +3,7 @@ package rose
 import (
 	"bytes"
 	"fmt"
-	"strings"
 	"os"
-)
-
-const (
-	whitespace string	= " \t\r\n"
 )
 
 var (
@@ -63,7 +58,7 @@ func wordlists(svect []string) [][]string {
 	z := len(svect)
 	lvect := make([][]string, z, z)
 	for i, s := range svect {
-		lvect[i] = strings.Split(s, whitespace)
+		lvect[i] = smash_cmd(s)
 	}
 	return lvect
 }
@@ -75,4 +70,33 @@ func bvect_to_svect(dvect [][]byte) []string {
 		svect[i] = string(b)
 	}
 	return svect
+}
+
+func ws(c int) bool {
+	return c == ' ' || c == '\t' || c == '\n' || c == '\r'
+}
+
+// do quoting later
+func smash_cmd(s string) []string {
+	b := []byte(s)
+	v := make([][]byte, 0, 0)
+	st := -1
+	for i, c := range b {
+		if ws(int(c)) {
+			if st >= 0 {
+				z := b[st:i]
+				v = append(v, z)
+				st = -1
+			}
+			continue
+		}
+		if st < 0 {
+			st = i
+		}
+	}
+	if st >= 0 {
+		z := b[st:len(b)]
+		v = append(v, z)
+	}
+	return bvect_to_svect(v)
 }
