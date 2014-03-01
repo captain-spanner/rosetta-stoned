@@ -10,6 +10,7 @@ const (
 	Config string		= "stone.conf"
 
 	debug bool		= true
+	message bool		= true
 	verbose bool		= true
 )
 
@@ -21,5 +22,6 @@ func init() {
 	if debug {
 		fmt.Println("Init...")
 	}
+	init_syms()
 	configure()
 }
