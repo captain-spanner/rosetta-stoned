@@ -14,12 +14,13 @@ type req struct {
 var (
 	none []string = make([]string, 0, 0)
 	cmdtab map[string]req = map[string]req {
-		"?":	{ cmd_help, 0, -1, "help"},
-		"#":	{ cmd_comment, 0, -1, "# comment until end of line"},
-		"//":	{ cmd_comment, 0, -1, "// comment until end of line"},
-		"help":	{ cmd_help, 0, -1, "help"},
-		"echo":	{ cmd_echo, 0, -1, "echo any stuff blah blah"},
-		"root":	{ cmd_root, 1, 1, "root <directory>"},
+		"?":		{ cmd_help, 0, -1, "help"},
+		"#":		{ cmd_comment, 0, -1, "# comment until end of line"},
+		"//":		{ cmd_comment, 0, -1, "// comment until end of line"},
+		"help":		{ cmd_help, 0, -1, "help"},
+		"index":	{ cmd_index, 0, 1, "index [ <name> ]"},
+		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah"},
+		"root":		{ cmd_root, 1, 1, "root <directory>"},
 	}
 )
 

@@ -1,9 +1,8 @@
 package rose
 
 import (
-	"bytes"
 	"fmt"
-	"os"
+	"strconv"
 	"strings"
 )
 
@@ -26,33 +25,6 @@ func diagx(mesg string, src string, ix int, die bool) {
 
 func bomb(src string, mesg string) {
 	fatal(src, 0, mesg)
-}
-
-func readfileb(file *os.File) []byte {
-	fi, err := file.Stat()
-	name := file.Name()
-	if err != nil {
-		bomb(name, "stat failed")
-	}
-	if !fi.Mode().IsRegular() {
-		bomb(name, "not a regular file")
-	}
-	size := fi.Size()
-	data := make([]byte, size, size)
-	n, err := file.Read(data)
-	if err != nil {
-		panic(err)
-	}
-	if int64(n) != size {
-		bomb(name, "short read")
-	}
-	return data
-}
-
-func readlines(file *os.File) []string {
-	data := readfileb(file)
-	dvect := bytes.Split(data, newline)
-	return bvect_to_svect(dvect)
 }
 
 func wordlists(svect []string) [][]string {
@@ -148,4 +120,13 @@ func str_bool(s string) (bool, string) {
 		return false, s + ": bad operand"
 	}
 	return b, ""
+}
+
+func str_int(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return 0
+	} else {
+		return i
+	}
 }

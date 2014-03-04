@@ -15,7 +15,7 @@ const (
 )
 
 var (
-	root string
+	root	string
 )
 
 func init() {

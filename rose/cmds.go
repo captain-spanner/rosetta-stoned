@@ -66,6 +66,20 @@ func cmd_help(argc int, args []string, src string, ix int, die bool) ([]string, 
 	return strv(m), 0
 }
 
+func cmd_index(argc int, args []string, src string, ix int, die bool) ([]string, int) {
+	if argc == 0 {
+		print_index()
+		return none, 0
+	} else {
+		e, m  := make_index(args[0])
+		if m != "" {
+			return strv(m), e
+		} else {
+			return none, e
+		}
+	}
+}
+
 func cmd_root(argc int, args []string, src string, ix int, die bool) ([]string, int) {
 	if root != "" {
 		m := "root already set"
@@ -73,6 +87,10 @@ func cmd_root(argc int, args []string, src string, ix int, die bool) ([]string, 
 		return strv(m), 1
 	}
 	root = args[0]
+	m := checkdir(root)
+	if m != "" {
+		fatal(root, 0, m)
+	}
 	if message {
 		fmt.Printf("root = %q\n", root)
 	}
