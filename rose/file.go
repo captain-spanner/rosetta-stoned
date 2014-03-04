@@ -2,6 +2,7 @@ package rose
 
 import (
 	"bytes"
+	"io"
 	"os"
 )
 
@@ -9,76 +10,94 @@ const (
 	Bsize	 int	= 1024
 )
 
-func readfileb(file *os.File) []byte {
+func readfileb(file *os.File) ([]byte, string) {
 	fi, err := file.Stat()
-	name := file.Name()
 	if err != nil {
-		bomb(name, "stat failed")
+		return nil, "stat failed"
 	}
 	if !fi.Mode().IsRegular() {
-		bomb(name, "not a regular file")
+		return nil, "not a regular file"
 	}
 	size := fi.Size()
 	data := make([]byte, size, size)
-	n, err := file.Read(data)
+	n, err := io.ReadFull(file, data)
 	if err != nil {
-		panic(err)
+		return nil, "read error"
 	}
 	if int64(n) != size {
-		bomb(name, "short read")
+		return nil, "short read"
 	}
-	return data
+	return data, ""
 }
 
-func readlines(file *os.File) []string {
-	data := readfileb(file)
+func readlines(file *os.File) ([]string, string) {
+	data, err := readfileb(file)
+	if err != "" {
+		return nil, err
+	}
 	dvect := bytes.Split(data, newline)
-	return bvect_to_svect(dvect)
+	return bvect_to_svect(dvect), ""
 }
 
 func checkdir(s string) string {
-	f, err := os.Open(s)
-	if err != nil {
-		return s + ": open failed"
+	f, err := fileopen(s, true)
+	if f != nil {
+		f.Close()
 	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return s + ": stat failed"
+	if err != "" {
+		return s + ": " + err
+	} else {
+		return ""
 	}
-	if !fi.IsDir() {
-		return s + ": not a directory"
-	}
-	return ""
 }
 
-func readpbytes(p string, s string, z int) ([]byte, string) {
-	n := p + "/" + s
+func fileopen(n string, dir bool) (*os.File, string) {
 	f, err := os.Open(n)
 	if err != nil {
-		return nil, n + ": open failed"
+		return nil, "open failed"
 	}
-	defer f.Close()
 	fi, err := f.Stat()
 	if err != nil {
-		return nil, n + ": stat failed"
+		return f, "stat failed"
 	}
 	m := fi.Mode()
-	if !m.IsRegular() {
-		return nil, n + ": not a file"
+	if dir {
+		if !m.IsDir() {
+			return f, "not a directory"
+		}
+	} else {
+		if !m.IsRegular() {
+			return f, "not a file"
+		}
 	}
-	b := make([]byte, z, z)
-	sz, err := f.Read(b)
-	if err != nil {
+	return f, ""
+}
+
+func readpbytes(p string, s string) ([]byte, string) {
+	n := p + "/" + s
+	f, err := fileopen(n, false)
+	if err != "" {
+		if f != nil {
+			f.Close()
+		}
+		return nil, n + ": " + err
+	}
+	defer f.Close()
+	b, err := readfileb(f)
+	if err != "" {
 		return nil, n + ": read failed"
 	}
-	return b[:sz], ""
+	return b, ""
 }
 
 func readpstr(p string, s string) (string, string) {
-	b, err := readpbytes(p, s, Bsize)
+	b, err := readpbytes(p, s)
 	if err != "" {
 		return "", err
+	}
+	l := len(b)
+	if l > 0 && b[l-1] == '\n' {
+		b = b[:l-1]
 	}
 	return string(b), ""
 }

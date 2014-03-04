@@ -5,7 +5,7 @@ import (
 )
 
 type req struct {
-	cmd	func(int, []string, string, int, bool) ([]string, int)
+	cmd	func(int, []string, cmdd) ([]string, int)
 	min	int
 	max	int
 	usage	string
@@ -13,19 +13,64 @@ type req struct {
 
 var (
 	none []string = make([]string, 0, 0)
+	cmdf *cmdb = &cmdb{ die: false }
+	cmdt *cmdb = &cmdb{ die: true }
 	cmdtab map[string]req = map[string]req {
 		"?":		{ cmd_help, 0, -1, "help"},
 		"#":		{ cmd_comment, 0, -1, "# comment until end of line"},
 		"//":		{ cmd_comment, 0, -1, "// comment until end of line"},
+		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]"},
 		"help":		{ cmd_help, 0, -1, "help"},
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]"},
 		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah"},
+		"message":	{ cmd_message, 0, 1, "message [ <bool> ]"},
 		"root":		{ cmd_root, 1, 1, "root <directory>"},
+		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]"},
 	}
 )
 
+type cmdd interface {
+	Src() string
+	Index() int
+	Die() bool
+}
+
+type cmdv struct {
+	src	string
+	index	int
+	die	bool
+}
+
+type cmdb struct {
+	die	bool
+}
+
+func (c *cmdv) Src() string {
+	return c.src
+}
+
+func (c *cmdv) Index() int {
+	return c.index
+}
+
+func (c *cmdv) Die() bool {
+	return c.die
+}
+
+func (c *cmdb) Src() string {
+	return ""
+}
+
+func (c *cmdb) Index() int {
+	return 0
+}
+
+func (c *cmdb) Die() bool {
+	return c.die
+}
+
 func Run_cmd(args []string) ([]string, int) {
-	return run_cmdx(len(args), args, "", 0, false)
+	return run_cmdx(len(args), args, cmdf)
 }
 
 func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, errv []int) {
@@ -33,7 +78,8 @@ func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, 
 	errc = 0
 	errv = make([]int, 0)
 	for i, args := range vect {
-		r, e := run_cmdx(len(args), args, src, i + 1, die)
+		cmd := &cmdv{ src: src, index: i + 1, die: die }
+		r, e := run_cmdx(len(args), args, cmd)
 		ret = append(ret, r)
 		errc += e
 		errv = append(errv, e)
@@ -41,14 +87,14 @@ func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, 
 	return
 }
 
-func run_cmdx(argc int, args []string, src string, ix int, die bool) (ret []string, err int) {
+func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {
 	ret = none
 	err = 0
 	if argc == 0 {
 		return
 	}
 	if verbose {
-		cmd_echo(argc, args, src, 0, die)
+		cmd_echo(argc, args, cmdi)
 	}
 	cmd := args[0]
 	set := false
@@ -70,13 +116,13 @@ func run_cmdx(argc int, args []string, src string, ix int, die bool) (ret []stri
 	cmdf, found := cmdtab[cmd]
 	if !found {
 		mesg := cmd + ": unknown command"
-		if die {
-			fatal(src, ix, mesg)
+		if cmdi.Die() {
+			fatal(cmdi.Src(), cmdi.Index(), mesg)
 		} else {
 			fmt.Println(mesg)
 			err = 1
 			return
 		}
 	}
-	return cmdf.cmd(argc, args, src, ix, die)
+	return cmdf.cmd(argc, args, cmdi)
 }
