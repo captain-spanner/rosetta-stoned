@@ -17,6 +17,12 @@ func init_syms() {
 	symtabs = make([]symtab, 2, 2)
 	symtabs[0] = globs
 	symtabs[1] = vars
+	glob_set("Copyright", Copyright)
+	glob_set("Version", Version)
+	glob_set("Config", Config)
+	glob_flag("debug", debug)
+	glob_flag("message", message)
+	glob_flag("verbose", verbose)
 }
 
 func var_getx(s string) ([]string, bool) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"strings"
 )
 
 var (
@@ -99,4 +100,52 @@ func smash_cmd(s string) []string {
 		v = append(v, z)
 	}
 	return bvect_to_svect(v)
+}
+
+func strv(s string) []string {
+	r := make([]string , 1, 1)
+	r[0] = s
+	return r
+}
+
+func bool_str(b bool) string {
+	if b {
+		return "true"
+	} else {
+		return "false"
+	}
+}
+
+func str_bool(s string) (bool, string) {
+	s = strings.ToLower(s)
+	b := false
+	switch s {
+	case "+":
+		b = true
+	case "-":
+		b = false
+	case "t":
+		b = true
+	case "f":
+		b = false
+	case "y":
+		b = true
+	case "n":
+		b = false
+	case "true":
+		b = true
+	case "false":
+		b = false
+	case "yes":
+		b = true
+	case "no":
+		b = false
+	case "on":
+		b = true
+	case "off":
+		b = false
+	default:
+		return false, s + ": bad operand"
+	}
+	return b, ""
 }

@@ -7,7 +7,40 @@ import (
 // Commands
 
 func cmd_comment(argc int, args []string, src string, ix int, die bool) ([]string, int) {
-	return nil, 0
+	return none, 0
+}
+
+func cmd_bool(name string, argc int, args []string) ([]string, int) {
+	e := 0
+	m := ""
+	if argc == 0 {
+		v, f := var_get(name)
+		if !f {
+			e = 1
+			m = "unknown"
+		} else {
+			m = v
+		}
+	} else {
+		b, v := str_bool(args[0])
+		if m != "" {
+			e = 1
+			m = v
+		} else {
+			m = bool_str(b)
+			glob_set(name, m)
+		}
+	}
+	m = name + " " + m
+	if message {
+		fmt.Println(m)
+	}
+	return strv(m), e
+}
+
+func cmd_debug(argc int, args []string, src string, ix int, die bool) ([]string, int) {
+	m, e := cmd_bool("debug", argc, args)
+	return m, e
 }
 
 func cmd_echo(argc int, args []string, src string, ix int, die bool) ([]string, int) {
@@ -19,27 +52,30 @@ func cmd_echo(argc int, args []string, src string, ix int, die bool) ([]string, 
 			e = e + " " + s
 		}
 	}
-	if debug || verbose {
+	if message {
 		fmt.Println(e)
 	}
-	r := make([]string , 1, 1)
-	r[0] = e
-	return r, 0
+	return strv(e), 0
 }
 
 func cmd_help(argc int, args []string, src string, ix int, die bool) ([]string, int) {
-	fmt.Println("I need somebody!")
-	return none, 0
+	m := "I need somebody!"
+	if message {
+		fmt.Println(m)
+	}
+	return strv(m), 0
 }
 
 func cmd_root(argc int, args []string, src string, ix int, die bool) ([]string, int) {
 	if root != "" {
-		diagx("root already set", src, ix, die)
-		return none, 1
+		m := "root already set"
+		diagx(m, src, ix, die)
+		return strv(m), 1
 	}
 	root = args[0]
-	if verbose {
+	if message {
 		fmt.Printf("root = %q\n", root)
 	}
+	glob_set("root", root)
 	return none, 0
 }

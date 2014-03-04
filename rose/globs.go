@@ -19,9 +19,7 @@ func (*globtab) set(s string, v []string) (string, bool) {
 }
 
 func glob_set(n string, v string) {
-	a := make([]string, 1, 1)
-	a[0] = v
-	globals[n] = a
+	globals[n] = strv(v)
 }
 
 func glob_flag(n string, f bool) {
