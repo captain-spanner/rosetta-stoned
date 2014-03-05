@@ -10,10 +10,9 @@ func cmd_comment(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return none, 0
 }
 
-func cmd_bool(name string, argc int, args []string) ([]string, int, bool) {
+func cmd_bool(name string, argc int, args []string, vp *bool) ([]string, int) {
 	e := 0
 	m := ""
-	r := false
 	if argc == 0 {
 		v, f := var_get(name)
 		if !f {
@@ -30,21 +29,50 @@ func cmd_bool(name string, argc int, args []string) ([]string, int, bool) {
 		} else {
 			m = bool_str(b)
 			glob_set(name, m)
-			r = b
+			*vp = b
 		}
 	}
 	m = name + " " + m
 	if message && argc == 0 {
 		fmt.Println(m)
 	}
-	return strv(m), e, r
+	return strv(m), e
+}
+
+func cmd_collection(argc int, args []string, cmdi cmdd) ([]string, int) {
+	if argc == 0 {
+		// v := print_indexes()
+		return none, 0
+	} else {
+		e, m  := make_collection(args[0])
+		if m != "" {
+			return strv(m), e
+		} else {
+			return none, e
+		}
+	}
+}
+
+func cmd_corpus(argc int, args []string, cmdi cmdd) ([]string, int) {
+	if argc == 0 {
+		// v := print_indexes()
+		return none, 0
+	} else {
+		opt := ""
+		if argc > 1 {
+			opt = args[1]
+		}
+		e, m  := make_corpus(args[0], opt)
+		if m != "" {
+			return strv(m), e
+		} else {
+			return none, e
+		}
+	}
 }
 
 func cmd_debug(argc int, args []string, cmdi cmdd) ([]string, int) {
-	m, e, b := cmd_bool("debug", argc, args)
-	if e == 0 && argc == 1 {
-		debug = b
-	}
+	m, e := cmd_bool("debug", argc, args, &debug)
 	return m, e
 }
 
@@ -86,10 +114,7 @@ func cmd_index(argc int, args []string, cmdi cmdd) ([]string, int) {
 }
 
 func cmd_message(argc int, args []string, cmdi cmdd) ([]string, int) {
-	m, e, b := cmd_bool("message", argc, args)
-	if e == 0 && argc == 1 {
-		message = b
-	}
+	m, e := cmd_bool("message", argc, args, &message)
 	return m, e
 }
 
@@ -112,9 +137,11 @@ func cmd_root(argc int, args []string, cmdi cmdd) ([]string, int) {
 }
 
 func cmd_verbose(argc int, args []string, cmdi cmdd) ([]string, int) {
-	m, e, b := cmd_bool("verbose", argc, args)
-	if e == 0 && argc == 1 {
-		verbose = b
-	}
+	m, e := cmd_bool("verbose", argc, args, &verbose)
+	return m, e
+}
+
+func cmd_xeq(argc int, args []string, cmdi cmdd) ([]string, int) {
+	m, e := cmd_bool("xeq", argc, args, &xeq)
 	return m, e
 }

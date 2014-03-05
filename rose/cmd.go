@@ -19,6 +19,8 @@ var (
 		"?":		{ cmd_help, 0, -1, "help"},
 		"#":		{ cmd_comment, 0, -1, "# comment until end of line"},
 		"//":		{ cmd_comment, 0, -1, "// comment until end of line"},
+		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]"},
+		"corpus":	{ cmd_corpus, 0, 2, "corpus [ <name> [ <option> ] ]"},
 		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]"},
 		"help":		{ cmd_help, 0, -1, "help"},
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]"},
@@ -26,6 +28,7 @@ var (
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]"},
 		"root":		{ cmd_root, 1, 1, "root <directory>"},
 		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]"},
+		"xeq":		{ cmd_xeq, 0, 1, "xeq [ <bool> ]"},
 	}
 )
 
@@ -93,7 +96,7 @@ func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {
 	if argc == 0 {
 		return
 	}
-	if verbose {
+	if xeq {
 		cmd_echo(argc, args, cmdi)
 	}
 	cmd := args[0]

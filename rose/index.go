@@ -2,11 +2,14 @@ package rose
 
 import (
 	"fmt"
+	"io/ioutil"
 )
 
 var (
 	indexm	map[string]*index = make(map[string]*index)
 	indexv	[]*index = make([]*index , 0, 0)
+	indexr	map[string]string = make(map[string]string)
+	corpi	[]*corpus = make([]*corpus , 0, 0)
 )
 
 const (
@@ -25,13 +28,13 @@ type index struct {
 }
 
 func (ix *index) print_index() string {
-	return fmt.Sprintf("%12s%8d%10s%5d%6t  %s",
-			ix.name, ix.count, hashes[ix.hash], ix.arg, ix.ok, ix.path)
+	return fmt.Sprintf("%8d%10s%5d%6t  %s",
+		ix.count, hashes[ix.hash], ix.arg, ix.ok, ix.name)
 }
 
 func print_header() {
-	fmt.Printf("%12s%8s%10s%5s%6s  %s\n",
-			"Name", "Count", "Encoding", "Arg", "Ok", "Path")
+	fmt.Printf("%8s%10s%5s%6s  %s\n",
+		"Count", "Encoding", "Arg", "Ready", "Name")
 }
 
 func print_indexes() []string {
@@ -116,5 +119,75 @@ func make_index(s string) (int, string) {
 	}
 	indexm[s] = ix
 	indexv = append(indexv, ix)
+	indexr[s] = s
+	return 0, ""
+}
+
+type corpus struct {
+	name	string
+	base	bool
+	parts	[]*index
+}
+
+func make_corpus(s string, opt string) (int, string) {
+	c := new(corpus)
+	c.name = s
+	c.base = false
+	p := root + "/" + s
+	v, err := ioutil.ReadDir(p)
+	if err != nil {
+		return 1, p + ": readdir failed"
+	}
+	l := make([]string, 0, 0)
+	for _, x := range v {
+		l = append(l, x.Name())
+	}
+	for _, f := range l {
+		p := s + "/" + f
+		e, m := make_index(p)
+		if m != "" {
+			return e, m
+		}
+	}
+	if opt == "base" {
+		if base != nil {
+			return 1, s + ": base is set"
+		}
+		d := make([]*index, int(pMax), int(pMax))
+		cnt := 0
+		for _, f := range l {
+			p := s + "/" + f
+			indexr[f] = p
+			c := partm[f]
+			if c != pNone {
+				d[int(c)] = indexm[p]
+				indexr[parts[c]] = p
+				cnt++
+			}
+		}
+		c.base = true
+		c.parts = d
+	}
+	corpi = append(corpi, c)
+	return 0, ""
+}
+
+func make_collection(s string) (int, string) {
+	p := root + "/" + s
+	v, err := ioutil.ReadDir(p)
+	if err != nil {
+		return 1, p + ": readdir failed"
+	}
+	l := make([]string, 0, 0)
+	for _, x := range v {
+		l = append(l, x.Name())
+	}
+	for _, f := range l {
+		p := s + "/" + f
+		e, m := make_index(p)
+		if m != "" {
+			return e, m
+		}
+	}
 	return 0, ""
 }
