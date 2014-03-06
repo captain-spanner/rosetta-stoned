@@ -13,6 +13,16 @@ const (
 	worthy	= 376
 )
 
+type indexer interface {
+	get(s string) []byte
+	put(s string, v []byte)
+	white() bool
+}
+
+type imap struct {
+	cmap	map[string][]byte
+}
+
 type icache struct {
 	cmap	map[string]*entry
 	queue	*indexpq
@@ -28,6 +38,36 @@ type entry struct {
 
 type indexpq []*entry
 
+func make_indexer(n int) indexer {
+	if n < worthy {
+		return make_imap()
+	} else {
+		return make_icache()
+	}
+}
+
+func make_imap() *imap {
+	c := new(imap)
+	c.cmap = make(map[string][]byte)
+	return c
+}
+
+func (c *imap) get(s string) []byte {
+	r, ok := c.cmap[s]
+	if !ok {
+		return nil
+	}
+	return r
+}
+
+func (c *imap) put(s string, v []byte) {
+	c.cmap[s] = v
+}
+
+func (c *imap) white() bool {
+	return false
+}
+
 func make_icache() *icache {
 	c := new(icache)
 	c.cmap = make(map[string]*entry)
@@ -37,7 +77,7 @@ func make_icache() *icache {
 	return c
 }
 
-func (c *icache) Get(s string) []byte {
+func (c *icache) get(s string) []byte {
 	r, ok := c.cmap[s]
 	if !ok {
 		return nil
@@ -46,7 +86,7 @@ func (c *icache) Get(s string) []byte {
 	return r.value
 }
 
-func (c *icache) Put(s string, v []byte) {
+func (c *icache) put(s string, v []byte) {
 	e := new(entry)
 	e.key = s
 	e.value = v
@@ -54,15 +94,18 @@ func (c *icache) Put(s string, v []byte) {
 	tstamp++
 	if c.count < limit {
 		heap.Push(c.queue, e)
-		c.cmap[s] = e
 		c.count++
 	} else {
 		// LRU
 		o := heap.Pop(c.queue).(*entry)
 		delete(c.cmap, o.key)
 		heap.Push(c.queue, e)
-		c.cmap[s] = e
 	}
+	c.cmap[s] = e
+}
+
+func (c *icache) white() bool {
+	return true
 }
 
 func (pq indexpq) Len() int { return len(pq) }
@@ -99,37 +142,3 @@ func (pq *indexpq) update(item *entry) {
 	heap.Push(pq, item)
 	tstamp++
 }
-
-/*
-func main() {
-	// Some items and their priorities.
-	items := map[string]int{
-		"banana": 3, "apple": 2, "pear": 4,
-	}
-
-	// Create a priority queue and put the items in it.
-	pq := &indexpq{}
-	heap.Init(pq)
-	for value, priority := range items {
-		item := &entry{
-			value:    value,
-			priority: priority,
-		}
-		heap.Push(pq, item)
-	}
-
-	// Insert a new item and then modify its priority.
-	item := &entry{
-		value:    "orange",
-		priority: 1,
-	}
-	heap.Push(pq, item)
-	pq.update(item, item.value, 5)
-
-	// Take the items out; they arrive in decreasing priority order.
-	for pq.Len() > 0 {
-		item := heap.Pop(pq).(*entry)
-		fmt.Printf("%.2d:%s ", item.priority, item.value)
-	}
-}
-*/
