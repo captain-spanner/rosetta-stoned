@@ -26,6 +26,7 @@ var (
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]"},
 		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah"},
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]"},
+		"raw":		{ cmd_raw, 2, 2, "raw <index> <word>"},
 		"root":		{ cmd_root, 1, 1, "root <directory>"},
 		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]"},
 		"xeq":		{ cmd_xeq, 0, 1, "xeq [ <bool> ]"},

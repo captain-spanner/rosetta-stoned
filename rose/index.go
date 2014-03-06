@@ -25,6 +25,7 @@ type index struct {
 	arg	int
 	imap	[]byte
 	cache	indexer
+	fetch	fetchf
 	ok	bool
 }
 
@@ -60,12 +61,12 @@ func print_indexes() []string {
 	return v
 }
 
-func (ix *index) decode_fmt() {
+func (ix *index) decode_fmt() bool {
 	v := smash_cmd(ix.format)
 	ix.hash = hError
 	ix.arg = 0
 	if len(v) < 2 {
-		return;
+		return false
 	}
 	switch v[0] {
 	case "hash":
@@ -75,9 +76,11 @@ func (ix *index) decode_fmt() {
 	case "seek":
 		ix.hash = hIndexed
 	default:
-		return
+		return false
 	}
 	ix.arg = str_int(v[1])
+	ix.fetch = fetchtv[ix.hash]
+	return true
 }
 
 func make_index(s string) (int, string) {
@@ -106,8 +109,8 @@ func make_index(s string) (int, string) {
 	} else {
 		ix.format = m
 	}
-	ix.decode_fmt()
-	if ix.count == 0 || ix.arg == 0 {
+	b := ix.decode_fmt()
+	if !b || ix.count == 0 || ix.arg == 0 {
 		ix.ok = false
 	}
 	if ix.ok {
@@ -193,4 +196,20 @@ func make_collection(s string) (int, string) {
 		}
 	}
 	return 0, ""
+}
+
+func (ix *index) get(s string, h uint32) []byte {
+	b := ix.cache.get(s)
+	if b != nil {
+		return b
+	}
+	if !checkmap(ix.imap, h) {
+		return nil
+	}
+	b = fetch_string(ix, s, h)
+	if b == nil {
+		return nil
+	}
+	ix.cache.put(s, b)
+	return b
 }

@@ -91,11 +91,6 @@ func cmd_echo(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return strv(e), 0
 }
 
-func cmd_get(argc int, args []string, cmdi cmdd) ([]string, int) {
-	_, m, e := fetch_raw(args[0], args[1])
-	return m, e
-}
-
 func cmd_help(argc int, args []string, cmdi cmdd) ([]string, int) {
 	m := "I need somebody!"
 	if message {
@@ -120,6 +115,11 @@ func cmd_index(argc int, args []string, cmdi cmdd) ([]string, int) {
 
 func cmd_message(argc int, args []string, cmdi cmdd) ([]string, int) {
 	m, e := cmd_bool("message", argc, args, &message)
+	return m, e
+}
+
+func cmd_raw(argc int, args []string, cmdi cmdd) ([]string, int) {
+	_, m, e := fetch_raw(args[0], args[1])
 	return m, e
 }
 

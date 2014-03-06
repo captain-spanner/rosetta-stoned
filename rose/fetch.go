@@ -14,16 +14,12 @@ var (
 
 type fetchf func(*index, string, uint32) []byte
 
-type fetcher interface {
-	fetch(string) ([]byte, string, int)
-}
-
 func fetch_file(p string, s string) []byte {
 	b, _ := readpbytes(p, s)
 	return b
 }
 
-func fetch_raw(x string, s string) ([]byte, []string, int) {
+func fetch_info(x string, s string) (*index, uint32, string) {
 	var ix *index
 	r, f := indexr[x]
 	if f {
@@ -31,9 +27,26 @@ func fetch_raw(x string, s string) ([]byte, []string, int) {
 	}
 	if !f {
 		m := x + ": not an index"
-		return nil, strv(m), 1
+		return nil, 0, m
 	}
 	h := hashs(s)
+	return ix, h, ""
+}
+
+func fetch_get(x string, s string) ([]byte, []string, int) {
+	ix, h, m := fetch_info(x, s)
+	if m != "" {
+		return nil, strv(m), 1
+	}
+	b := ix.get(s, h)
+	return b, none, 0
+}
+
+func fetch_raw(x string, s string) ([]byte, []string, int) {
+	ix, h, m := fetch_info(x, s)
+	if m != "" {
+		return nil, strv(m), 1
+	}
 	b := fetch_string(ix, s, h)
 	return b, none, 0
 }
