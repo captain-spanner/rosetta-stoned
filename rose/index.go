@@ -24,6 +24,7 @@ type index struct {
 	hash	hashc
 	arg	int
 	imap	[]byte
+	cache	indexer
 	ok	bool
 }
 
@@ -105,17 +106,19 @@ func make_index(s string) (int, string) {
 	} else {
 		ix.format = m
 	}
-	if ix.count != 0 {
+	ix.decode_fmt()
+	if ix.count == 0 || ix.arg == 0 {
+		ix.ok = false
+	}
+	if ix.ok {
 		b, err := readpbytes(p, "«map»")
 		if err != "" {
+			ix.ok = false
 			return 1, err
 		} else {
 			ix.imap = b
 		}
-	}
-	ix.decode_fmt()
-	if ix.count == 0 || ix.arg == 0 {
-		ix.ok = false
+		ix.cache = make_indexer(ix.count)
 	}
 	indexm[s] = ix
 	indexv = append(indexv, ix)

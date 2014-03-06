@@ -16,7 +16,6 @@ const (
 type indexer interface {
 	get(s string) []byte
 	put(s string, v []byte)
-	white() bool
 }
 
 type imap struct {
@@ -64,10 +63,6 @@ func (c *imap) put(s string, v []byte) {
 	c.cmap[s] = v
 }
 
-func (c *imap) white() bool {
-	return false
-}
-
 func make_icache() *icache {
 	c := new(icache)
 	c.cmap = make(map[string]*entry)
@@ -102,10 +97,6 @@ func (c *icache) put(s string, v []byte) {
 		heap.Push(c.queue, e)
 	}
 	c.cmap[s] = e
-}
-
-func (c *icache) white() bool {
-	return true
 }
 
 func (pq indexpq) Len() int { return len(pq) }
