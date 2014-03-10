@@ -27,6 +27,9 @@ func fetch_info(x string, s string) (*index, uint32, string) {
 	}
 	if !f {
 		m := x + ": not an index"
+		if verbose {
+			fmt.Println(m)
+		}
 		return nil, 0, m
 	}
 	h := hashs(s)

@@ -92,7 +92,14 @@ func cmd_echo(argc int, args []string, cmdi cmdd) ([]string, int) {
 }
 
 func cmd_get(argc int, args []string, cmdi cmdd) ([]string, int) {
-	_, m, e := fetch_get(args[0], args[1])
+	v, m, e := fetch_get(args[0], args[1])
+	if message {
+		if e != 0 || len(v) == 0 {
+			fmt.Printf("%s: %s: not found\n", args[1], args[0])
+		} else {
+			fmt.Printf("%s", string(v))
+		}
+	}
 	return m, e
 }
 

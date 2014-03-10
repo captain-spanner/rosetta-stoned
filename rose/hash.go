@@ -1,5 +1,8 @@
 package rose
 
+import (
+)
+
 const (
 	hashp	= 16777619
 	nprimes	= 8
@@ -36,7 +39,10 @@ func hashrot(h uint32) uint32 {
 }
 
 func issetmap(m []byte, x uint32, i int) bool {
-	return (m[x] & (1 << uint(i))) != 0
+	b := m[x]
+	t := b & (1 << uint(i))
+	set := t != 0
+	return set
 }
 
 func checkmap(m []byte, h uint32) bool {
@@ -44,7 +50,7 @@ func checkmap(m []byte, h uint32) bool {
 	for i, p := range primes {
 		h *= p
 		x := h % z
-		if issetmap(m, x, i) {
+		if !issetmap(m, x, i) {
 			return false
 		}
 		h = hashrot(h)

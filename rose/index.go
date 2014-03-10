@@ -211,12 +211,25 @@ func make_collection(s string) (int, string) {
 }
 
 func (ix *index) get(s string, h uint32) []byte {
+	if verbose {
+		fmt.Printf("ix.get(%q)\n", s)
+	}
 	b := ix.cache.get(s)
 	if b != nil {
 		return b
 	}
+	if verbose {
+		fmt.Println("not in cache")
+	}
 	if !checkmap(ix.imap, h) {
+		if verbose {
+			fmt.Println("not in map")
+		}
 		return nil
+	} else {
+		if verbose {
+			fmt.Println("in map")
+		}
 	}
 	b = fetch_string(ix, s, h)
 	if b == nil {

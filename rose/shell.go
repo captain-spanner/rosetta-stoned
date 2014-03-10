@@ -23,7 +23,8 @@ func Shell(q bool) string {
 			fmt.Printf("%s", prompt)
 		}
 		line, err := r.ReadString('\n')
-		if err != nil {
+		// fix
+		if err != nil || (len(line) >=4 && line[0:4] == "quit") {
 			break
 		}
 		run_cmd(line)
