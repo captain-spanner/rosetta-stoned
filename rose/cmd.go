@@ -9,6 +9,7 @@ type req struct {
 	min	int
 	max	int
 	usage	string
+	desc	string
 }
 
 var (
@@ -16,20 +17,22 @@ var (
 	cmdf *cmdb = &cmdb{ die: false }
 	cmdt *cmdb = &cmdb{ die: true }
 	cmdtab map[string]req = map[string]req {
-		"?":		{ cmd_help, 0, -1, "help"},
-		"#":		{ cmd_comment, 0, -1, "# comment until end of line"},
-		"//":		{ cmd_comment, 0, -1, "// comment until end of line"},
-		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]"},
-		"corpus":	{ cmd_corpus, 0, 2, "corpus [ <name> [ <option> ] ]"},
-		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]"},
-		"help":		{ cmd_help, 0, -1, "help"},
-		"index":	{ cmd_index, 0, 1, "index [ <name> ]"},
-		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah"},
-		"message":	{ cmd_message, 0, 1, "message [ <bool> ]"},
-		"raw":		{ cmd_raw, 2, 2, "raw <index> <word>"},
-		"root":		{ cmd_root, 1, 1, "root <directory>"},
-		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]"},
-		"xeq":		{ cmd_xeq, 0, 1, "xeq [ <bool> ]"},
+		"?":		{ cmd_help, 0, -1, "help", "help"},
+		"#":		{ cmd_comment, 0, -1, "# comment until end of line", "comment"},
+		"//":		{ cmd_comment, 0, -1, "// comment until end of line", "comment"},
+		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]", "manage collections"},
+		"corpus":	{ cmd_corpus, 0, 2, "corpus [ <name> [ <option> ] ]", "manage corpi"},
+		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]", "manage debug"},
+		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah", "echo arguments"},
+		"get":		{ cmd_get, 2, 2, "get <index> <word>", "get data"},
+		"getu":		{ cmd_getu, 2, 2, "getu <index> <word>", "get uncached data"},
+		"help":		{ cmd_help, 0, -1, "help", "help"},
+		"index":	{ cmd_index, 0, 1, "index [ <name> ]", "manage indexes"},
+		"interactive":	{ cmd_interactive, 0, 1, "interactive [ <bool> ]", "manage interactive"},
+		"message":	{ cmd_message, 0, 1, "message [ <bool> ]", "manage message"},
+		"root":		{ cmd_root, 1, 1, "root <directory>", "set root"},
+		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]", "manage verbose"},
+		"xeq":		{ cmd_xeq, 0, 1, "xeq [ <bool> ]", "manage xeq"},
 	}
 )
 
@@ -89,6 +92,12 @@ func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, 
 		errv = append(errv, e)
 	}
 	return
+}
+
+func run_cmd(s string) ([]string, int) {
+	args := smash_cmd(s)
+	v, e := Run_cmd(args)
+	return v, e
 }
 
 func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {

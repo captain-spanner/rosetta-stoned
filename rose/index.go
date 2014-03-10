@@ -155,27 +155,39 @@ func make_corpus(s string, opt string) (int, string) {
 			return e, m
 		}
 	}
+	isbase := false
 	if opt == "base" {
+		isbase = true
+	}
+	e := 0
+	m := ""
+	if isbase {
 		if base != nil {
-			return 1, s + ": base is set"
+			e = 1
+			m = s + ": base is set"
+			isbase = false
+		} else {
+			base = c
+			c.base = true
 		}
-		d := make([]*index, int(pMax), int(pMax))
-		cnt := 0
-		for _, f := range l {
-			p := s + "/" + f
-			indexr[f] = p
-			c := partm[f]
-			if c != pNone {
-				d[int(c)] = indexm[p]
-				indexr[parts[c]] = p
-				cnt++
+	}
+	d := make([]*index, int(pMax), int(pMax))
+	for _, f := range l {
+		p := s + "/" + f
+		indexr[f] = p
+		c := partm[f]
+		if c != pNone {
+			d[c] = indexm[p]
+			pf := parts[c]
+			indexr[s + "." + pf] = p
+			if isbase {
+				indexr[pf] = p
 			}
 		}
-		c.base = true
-		c.parts = d
 	}
+	c.parts = d
 	corpi = append(corpi, c)
-	return 0, ""
+	return e, m
 }
 
 func make_collection(s string) (int, string) {
