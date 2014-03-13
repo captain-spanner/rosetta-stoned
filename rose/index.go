@@ -15,6 +15,10 @@ var (
 const (
 )
 
+type part interface {
+	Describe() string
+}
+
 type index struct {
 	name	string
 	path	string
@@ -23,7 +27,9 @@ type index struct {
 	format	string
 	hash	hashc
 	arg	int
+	argx	int
 	imap	[]byte
+	imapz	int
 	cache	indexer
 	fetch	fetchf
 	ok	bool
@@ -79,6 +85,9 @@ func (ix *index) decode_fmt() bool {
 		return false
 	}
 	ix.arg = str_int(v[1])
+	if len(v) > 2 {
+		ix.argx = str_int(v[2])
+	}
 	ix.fetch = fetchtv[ix.hash]
 	return true
 }
@@ -120,6 +129,7 @@ func make_index(s string) (int, string) {
 			return 1, err
 		} else {
 			ix.imap = b
+			ix.imapz = len(b)
 		}
 		ix.cache = make_indexer(ix.count)
 	}
@@ -133,6 +143,7 @@ type corpus struct {
 	name	string
 	base	bool
 	parts	[]*index
+	pcaches	*pcache
 }
 
 func make_corpus(s string, opt string) (int, string) {

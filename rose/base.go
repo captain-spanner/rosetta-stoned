@@ -28,6 +28,7 @@ const (
 	pIn
 	pIr
 	pIv
+	pVn
 	pVs
 	pVx
 	pXj
@@ -83,12 +84,30 @@ var (
 		pIn:	"Ni",
 		pIr:	"Ri",
 		pIv:	"Vi",
+		pVn:	"Vn",
 		pVs:	"Vs",
-		pVx:	"Vx",
 		pXj:	"Jx",
 		pXn:	"Nx",
 		pXr:	"Rx",
 		pXv:	"Vx",
+	}
+
+	partt map[string]partc	= map[string]partc {
+		"Cl":	pCl,
+		"Jd":	pDj,
+		"Nd":	pDn,
+		"Rd":	pDr,
+		"Vd":	pDv,
+		"Ji":	pIj,
+		"Ni":	pIn,
+		"Ri":	pIr,
+		"Vi":	pIv,
+		"Vn":	pVn,
+		"Vs":	pVs,
+		"Jx":	pXj,
+		"Nx":	pXn,
+		"Rx":	pXr,
+		"Vx":	pXv,
 	}
 )
 

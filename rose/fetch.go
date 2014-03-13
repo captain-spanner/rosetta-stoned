@@ -45,6 +45,11 @@ func fetch_get(x string, s string) ([]byte, []string, int) {
 	return b, none, 0
 }
 
+func fetch_getx(ix *index, s string) []byte {
+	h := hashs(s)
+	return ix.get(s, h)
+}
+
 func fetch_raw(x string, s string) ([]byte, []string, int) {
 	ix, h, m := fetch_info(x, s)
 	if m != "" {
@@ -67,7 +72,14 @@ func fetch_indexed(ix *index, s string, h uint32) []byte {
 	if len(s) < 8 {
 		return nil
 	}
-	p := ix.path + "/" + s[:ix.arg]
+	p := ""
+	if ix.argx == 8 {
+		p = ix.path + "/" + s[:ix.arg]
+	} else if ix.argx == 9 {
+		p = ix.path + "/" + s[3:ix.arg+3]
+	} else {
+		return nil
+	}
 	return fetch_file(p, s)
 }
 

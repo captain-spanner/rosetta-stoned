@@ -140,6 +140,18 @@ func cmd_message(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return m, e
 }
 
+func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
+	p, m, e := part_get(args[0], args[1])
+	if message {
+		if e != 0 || p == nil {
+			fmt.Printf("%s: %s: not found\n", args[1], args[0])
+		} else {
+			fmt.Println("ok")
+		}
+	}
+	return strv(m), e
+}
+
 func cmd_root(argc int, args []string, cmdi cmdd) ([]string, int) {
 	if root != "" {
 		m := "root already set"
