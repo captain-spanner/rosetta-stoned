@@ -1,0 +1,37 @@
+. params
+#tdir=wordnet
+#tdir=wnjpn
+#tdir=freedict
+tdir=geo
+tmpd=/n/tmp/$tdir
+destd=/n/fossil/index/$tdir
+list=`{
+for (dir in `{ls $tmpd}) {
+	@{
+		cd $tmpd/$dir
+		sed 's/.*/'^$dir^'\/&/' «dirs»
+	}
+} }
+
+> /tmp/missing
+> /tmp/sizes
+> /tmp/errs
+for (dir in $list) {
+tmp=$tmpd/$dir
+dest=$destd/$dir
+echo -n fixing $dir ''
+@{cd $tmp; ls | $quote } | sort > /tmp/fix0
+wc -l < /tmp/fix0 >> /tmp/sizes
+@{cd $dest; ls | $quote } | sort > /tmp/fix1
+echo -n have `{wc -l < /tmp/fix0}- arch `{wc -l < /tmp/fix1} ''
+	comm -23 /tmp/fix0 /tmp/fix1 > /tmp/need
+	sed 's/\(.*\)/echo $dir\/\1 >> \/tmp\/missing\
+		echo -n .\
+		cp $tmp\/\1 $dest\/\1 >>[2] \/tmp\/errs || echo -n x/' \
+		/tmp/need | rc
+	echo done
+}
+echo `{wc -l < /tmp/missing} installed
+echo largest dir `{sort -nr /tmp/sizes | sed 1q}
+echo `{wc -l < /tmp/errs} errors
+sed 5q /tmp/errs

@@ -1,0 +1,20 @@
+. params
+srcd=$wordnetd
+tmpd=$tmpd/wordnet
+
+list=`{cat wordnet.list}
+
+for (dir in $list) {
+	tmp=$tmpd/$dir
+	src=$srcd/$dir
+	cd $tmp
+	echo $dir:
+	ls | xargs -d\n /bin/rm -f -- X
+	sed -e '/^ /d' -e 's/''/''''/g' \
+		-e 's/\$/ /g' -e 's/\//÷/g' -e 's/ *$//' \
+	-e 's/^\([^ %]*\) *\(.*\)/cat >> ''\1'' <<EOF\
+\2\
+EOF/' \
+	$src | 
+	rc
+}

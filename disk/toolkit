@@ -1,0 +1,527 @@
+. params
+
+fn XX {
+	sudo echo you are you
+	. params
+	{
+		dirs=(venti fossil pus data tmp tmp2)
+		fss=(pus data tmp)
+		echo . params
+		for(d in $dirs) {
+			echo mkdir -p /n/$d
+			echo chown brucee /n/$d
+			echo chgrp brucee /n/$d
+		}
+		for(fs in $fss) {
+			echo mount /dev/$fs /n/$fs
+		}
+	} | sudo bash
+}
+
+fin goins {
+	sudo bash <<EOF
+. params
+set -x
+mkdir -p $god
+chown brucee $god
+chgrp brucee $god
+EOF
+	tar -C /usr/local -xzf $gosrc
+}
+
+# doesn't work. copy and send.
+fn v0 {
+	sudo bash <<EOF
+. params
+set -x
+chown brucee $ventid $fossild $pusd $datad $tmpd $tmpd2
+chgrp brucee $ventid $fossild $pusd $datad $tmpd $tmpd2
+ln -s -T $ventid /dev/venti
+ln -s -T $fossild /dev/fossil
+ln -s -T $pusd /dev/pus
+ln -s -T $datad /dev/data
+ln -s -T $tmpd /dev/tmp
+ln -s -T $tmp2d /dev/tmp2
+EOF
+}
+
+fn v1 {
+	set -x
+	venti/fmtisect isect0. /dev/venti:4096m-4608m
+	venti/fmtisect isect1. /dev/venti:4608m-5120m
+	venti/fmtarenas arenas0. /dev/venti:0-2048m
+	venti/fmtarenas arenas1. /dev/venti:2048m-4096m
+	venti/fmtbloom /dev/venti:5120m-5152m
+	venti/fmtindex venti.conf
+	fossil/flfmt /dev/fossil
+	set +x
+}
+
+fn vix {
+	venti/fmtisect isect2. /dev/venti:5152m-5632m
+	venti/fmtisect isect3. /dev/venti:5632m-6144m
+	venti/fmtarenas arenas2. /dev/venti:13312m-15360m
+	venti/fmtisect isect4.  /dev/venti:6144m-6656m
+	venti/fmtarenas arenas3. /dev/venti:11264m-13312m
+}
+
+fn v2 {
+	set -x
+fossil/conf -w /dev/fossil <<EOF
+fsys main config
+fsys main venti tcp!127.0.0.1!venti
+fsys main open -AWP
+fsys main
+users
+uname brucee :brucee
+uname index :index
+uname index +brucee
+uname data :data
+uname data +brucee
+create /active/brucee brucee brucee d775
+create /active/index index index d775
+create /active/data data data d775
+users -w
+sync
+snap -a
+halt
+EOF
+	set +x
+}
+
+fn v3 {
+	set -x
+venti/venti
+fossil/fossil -f /dev/fossil &
+ps -elf | grep fossil
+	set +x
+}
+
+fn v4 {
+	set -x
+fossil/conf -w /dev/fossil <<EOF
+srv -p fscons
+fsys main config
+fsys main venti tcp!127.0.0.1!venti
+fsys main open -APW
+fsys main snaptime -a0100 -s45 -t90
+fsys main snapclean 45
+# fsys main snap -a
+srv fossil
+EOF
+	set +x
+}
+
+# hmmm... from bash
+fn v5 {
+	set -x
+sudo bash <<EOF
+mkdir -p /n/fossil
+chown brucee /n/fossil
+chgrp brucee /n/fossil
+chown brucee /n
+chgrp brucee /n
+chmod 664 /etc/fuse.conf
+EOF
+	set +x
+}
+
+fn mntfs {
+	set -x
+	ns=`{namespace}
+	unmount /n/fossil >[2] /dev/null
+	9 mount $ns/fossil /n/fossil
+	set +x
+}
+
+fn populate {
+	for(dir in $*) {
+		fsd=$fs/index/geo/$dir
+		mkdir -p $fsd
+		@{
+			builtin cd $dir
+			cp «* $fsd
+			@{
+				builtin cd $fsd
+				mkdir -p `{cat «dirs»}
+			}
+		}
+	}
+}
+
+fn data93 {
+	dir=$1
+	rm -f «*
+	files=/tmp/files.$dir
+	ls > $files
+	wc -l < $files > '«count»'
+	mv $files '«files»'
+	cat '«files»' | sed 's/^...\(...\).*/\1/' |
+		sort -u > '«dirs»'
+	mkdir `{cat '«dirs»'}
+	cat '«files»' | sed 's/^...\(...\).*/mv & \1/' | rc
+	echo 'seek 3 9' > '«format»'
+	$bin/map
+}
+
+fn mkmaps {
+	for(part in adj adv noun verb) {
+		dir=$part^.map
+		mkdir $targ/$dir
+		cp $dir/«* $targ/$dir
+		@{
+			cd $targ/$dir
+			mkdir `{cat «dirs»}
+		}
+	}
+}
+
+fn bins {
+	9c hash.c && 9l -o hash hash.o
+	9c hashtest.c && 9l -o hashtest hashtest.o
+	9c map.c && 9l -o map map.o
+	9c maptest.c && 9l -o maptest maptest.o
+	9c line.c && 9l -o line line.o
+	9c quote.c && 9l -o quote quote.o
+	9c b64int.c && 9l -o b64int b64int.o
+	9c getoff.c && 9l -o getoff getoff.o
+}
+
+fn texthash {
+	for(i in `{ls | grep -v data}) {
+		@{
+			cd $i
+			$hash
+		}
+	}
+}
+
+fn indexdirs {
+	src=/home/brucee/tmp/wordnet
+	for(dir in *) {
+		@{
+			cd $dir
+			cp $src/$dir/«* .
+			mkdir -p `{cat «dirs»}
+		}
+	}
+}
+
+fn mkjpn {
+dir=$wnjpnd
+sudo bash <<EOF
+set -x
+mkdir -p $dir
+chown brucee $dir
+chgrp brucee $dir
+EOF
+}
+
+fn indexdirs {
+	for(dir in $*) {
+		@{
+			builtin cd $dir
+			rm -f «*
+			files=/tmp/files.$dir
+			ls > $files
+			wc -l < $files > '«count»'
+			mv $files '«files»'
+			$hash | rc
+			$bin/map
+		}
+	}
+}
+
+fn buildjpn {
+	@{
+	cd $tmpd/wnjpn
+	sed -e 's/\//÷/g' -e 's/#/¤/g' -e 's/\$/ /g' -e 's/^\([^	 ]*\)[	 ]*\([^	 ]*\)[	 ]*\(.*\)/echo ''\1 \3'' >> ''\2''/' $wnjpn | rc
+	}
+}
+
+fn buildfn1 {
+	dir0=(eng-ita eng-lat eng-lit eng-nld)
+	dir1=(eng-por eng-rom eng-rus)
+	dir2=(eng-spa eng-srp eng-swa eng-swe)
+	dir3=(eng-tur fra-bre fra-deu fra-eng)
+	dir4=(fra-nld gla-deu gle-eng gle-pol)
+	dir5=(hrv-eng hun-eng isl-eng ita-deu)
+	dir6=(ita-eng jpn-deu kha-deu)
+	buildfda $dir0
+	buildfda $dir1
+	buildfda $dir2
+	buildfda $dir3
+	buildfda $dir4
+	buildfda $dir5
+	buildfda $dir6
+}
+
+fn go2 {
+	@{
+		fn cd
+		buildfn2
+	}
+}
+
+fn buildfn2 {
+	dir0=(kha-eng kur-deu kur-eng kur-tur)
+	dir1=(lat-deu lat-eng lit-eng)
+	dir2=(mkd-bul nld-deu nld-eng nld-fra)
+	dir3=(nno-nob oci-cat pol-gle)
+	dir4=(por-deu por-eng san-deu slk-eng)
+	dir5=(spa-ast spa-eng srp-eng swa-eng)
+	dir6=(swe-eng swh-pol tur-deu tur-eng)
+	buildfda $dir0
+	buildfda $dir1
+	buildfda $dir2
+	buildfda $dir3
+	buildfda $dir4
+	buildfda $dir5
+	buildfda $dir6
+}
+
+fn buildfda {
+	for(dir in $*) {
+		@{ buildfd $dir } &
+	}
+	wait
+}
+
+fn buildgeo {
+	tmpd=/n/tmp
+	for(dir in $*) {
+		dict=`{pwd}^/$dir
+		dest=$tmpd/geo/$dir
+		mkdir -p $dest
+		@{
+			t=/tmp/tmp-$dir
+			echo start > $t
+			echo Extracting files for $dir
+			builtin cd $dest
+			echo in `{pwd}
+			echo dict is $dict
+			x=x
+			y=x
+			t20=11111111111111111111x
+			cnt=0
+			total=`{wc -l < $dict}
+			sed -e '/^ /d' -e '/^$/d' $dict |
+			read -m |
+			while(true) {
+				$bin/line
+				if(~ `{wc -c < '«line»'} [01]) {
+					exit
+				}
+				sed -e 's/ *$//' \
+					-e 's/\//÷/g' \
+					-e 's/#/¤/g' \
+					-e 's/\$/ /g' \
+					-e 's/''/''''/g' \
+					'«line»' > '«contents»'
+					echo data >> $t
+					sed 's/^[^% ]* *\(.*\)/\1/' '«contents»' > '«data»'
+					echo word >> $t
+					sed 's/^\([^% ]*\).*/cat «data» >> ''\1''/' '«contents»' | rc ||
+					{
+						echo screwed
+						exit
+					}
+				x=1$x
+				if(~ $x $t20) {
+					y=1$y
+					if(~ $y $t20) {
+						cnt=`{expr $cnt + 400}
+						perm=`{expr '(' $cnt '*' 10000 + 5 ')' / $total / 10}
+						perc=`{echo $perm | sed -e 's/^.$/0&/' -e 's/\(.*\)\(.\)/\1.\2/'}
+						echo -n $perc^'% '
+						y=x
+					}
+					x=x
+				}
+			}
+		}
+		rm -f '«line»' '«contents»' '«data»'
+	}
+}
+
+fn buildfd {
+	for(dir in $*) {
+		dict=`{pwd}^/$dir/$dir.dict
+		index=`{pwd}^/$dir/$dir.index
+		dest=$tmpd/freedict/$dir
+		mkdir -p $dest
+		@{
+			echo Extracting files for $dir
+			cd $dest
+			sed -e '/^	/d' \
+				-e 's/''/''''/g' \
+				-e 's/^\([^	]*\)	\([^	 ]*\)[	 ]*\(.*\)/$bin\/getoff $dict `{$bin\/b64int ''\2''} `{$bin\/b64int ''\3''} > ''\1''/' \
+				$index |
+			rc
+			echo Files for $dir extracted
+			@{
+				echo Launching hash for $dir
+				files=/tmp/files.$dir
+				ls > $files
+				wc -l < $files > '«count»'
+				mv $files '«files»'
+				$hash | rc
+				echo Hash of $dir completed
+				echo Making map for $dir
+				$bin/map
+				echo Map of $dir completed
+				fsd=$fs/index/freedict/$dir
+				mkdir -p $fsd
+				@{
+					builtin cd $fsd &&
+					rm -rf *
+				}
+				cp «* $fsd
+				@{
+					builtin cd $fsd
+					mkdir -p `{cat «dirs»}
+				}
+				echo Dir $fsd prepared
+			} &
+		}
+	}
+	echo Wait for hashes
+}
+
+fn fixfd {
+	@{
+		cd $tmpd/freedict
+		for(dir in `{ls -d *-*}) {
+			@{
+				cd $dir
+				fsd=$fs/index/freedict/$dir
+				cp «* $fsd
+				cd $fsd
+				mkdir -p `{cat «dirs»}
+			}
+		}
+	}
+}
+
+fn buildjpnrev {
+	@{
+	cd $tmpd/wnjpn
+	sed -e 's/\//÷/g' -e 's/#/¤/g' -e 's/\$/ /g' \
+		-e 's/^\([0-9]*\)\(..\)[	 ]*\([^	 ]*\).*/echo ''\3'' >> ''D\2''\/\1/' \
+	-e 's/D-a/adj.map/' \
+	-e 's/D-n/noun.map/' \
+	-e 's/D-r/adv.map/' \
+	-e 's/D-v/verb.map/' \
+	$wnjpn | rc
+	}
+}
+
+fn chkfd {
+	> mv-fr
+	> fr-log
+	for(file in $*) {
+		tar tjv < $file > /tmp/tjv
+		if(grep '\.dz' /tmp/tjv > /dev/null) {
+			echo $file: OK
+			echo mv $file freedict >> mv-fr
+		}
+		if not {
+			echo $file: FAIL
+			cat /tmp/tjv >> fr-log
+		}
+	}
+	cat mv-fr
+	if(! grep . fr-log > /dev/null) {
+		echo fail list is '''cat fr-log'''
+	}
+	echo maybe run '''rc mv-fr'''
+}
+
+fn undz {
+	for(dir in $*) {
+		@{
+			cd $dir
+			base=`{ls *dz | sed 's/\(.*\).dz$/\1/'}
+			gunzip < $base.dz > $base
+		}
+	}
+}
+
+fn freedict {
+	for(file in *.gz) {
+		tar xz < $file
+	}
+	for(file in *.zip) {
+		unzip $file
+	}
+	for(file in *.bz2) {
+		bunzip2 < $file | tar x
+	}
+}
+
+fn fixix {
+	> /tmp/some
+	for(dir in ??) {
+		@{
+			cd $dir
+			ls
+		} >> /tmp/some
+	}
+	sort /tmp/some > /tmp/files
+	wc -l < /tmp/files > '«count»'
+	cp /tmp/files '«files»'
+	rm /tmp/files /tmp/some
+}
+
+fn mkdo {
+	mkdir -p $fsgo
+	mkdir -p $gosrc/hello
+	cd $gosrc/hello
+	cp $bin/hello.go .
+	go install
+	go run hello.go
+	cd $gosrc
+	sudo apt-get install git
+	git config --global user.email 'bruce.ellis@gmail.com'
+	git config --global user.name 'Bruce Ellis'
+	git add hello hello/hello.go
+	git commit -m 'Get Rosetta Stoned'
+	mkdir -p $gosrc/rose
+	cd $gosrc/rose
+	cp $bin/base.go .
+	go build
+	go install
+	mkdir -p $god
+	# cd $gosrc
+	# cp -r .git * $god/src
+	# commit
+	@{
+		cd $god/src
+		cp -r .git * $gosrc
+	}
+}
+
+fn zup {
+	wc «*
+}
+
+fn fssync {
+	venti/sync
+}
+
+fn zap {
+	ls | xargs -d\n /bin/rm -rf -- X
+}
+
+fn cnt {
+	ls > /tmp/files
+	wc -l < /tmp/files > '«count»'
+	mv /tmp/files '«files»'
+}
+
+fn run { @{ cd ../stone; go run choof.go } }
+fn build { go build }
+
+fn gitsync {
+	git push -u origin master
+}
