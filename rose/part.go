@@ -63,6 +63,10 @@ func make_pdata(b []byte) part {
 
 type pindex struct {
 	value	[]byte
+	pos	byte
+	pvect	[]byte
+	sensez	int
+	senses	[]uint32
 }
 
 func (p *pindex) Content() []byte {
@@ -75,7 +79,26 @@ func (*pindex) Describe() string {
 
 func make_pindex(b []byte) part {
 	p := new(pindex)
+	b = bytes2x(b)
 	p.value = b
+	v := smash_cmd(string(b))
+	p.pos = byte(v[0][0])
+	sz := str_int(v[1])
+	pz := str_int(v[2])
+	pv := make([]byte, pz, pz)
+	for i := 0; i < pz; i++ {
+		pv[i] = byte(v[3+i][0])
+	}
+	p.pvect = pv
+	o := 3 + pz + 2
+	sv := make([]uint32, sz, sz)
+	for i := 0; i < sz; i++ {
+		if i == 0 {
+			p.sensez = len(v[o+i])
+		}
+		sv[i] = str_uint(v[o+i])
+	}
+	p.senses = sv
 	return p
 }
 
