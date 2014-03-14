@@ -16,6 +16,7 @@ const (
 )
 
 type part interface {
+	Content() []byte
 	Describe() string
 }
 

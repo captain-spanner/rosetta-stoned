@@ -30,6 +30,7 @@ var (
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]", "manage indexes"},
 		"interactive":	{ cmd_interactive, 0, 1, "interactive [ <bool> ]", "manage interactive"},
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]", "manage message"},
+		"part":		{ cmd_part, 2, 2, "part <index> <word>", "get part of speach"},
 		"root":		{ cmd_root, 1, 1, "root <directory>", "set root"},
 		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]", "manage verbose"},
 		"xeq":		{ cmd_xeq, 0, 1, "xeq [ <bool> ]", "manage xeq"},

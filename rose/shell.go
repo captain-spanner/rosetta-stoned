@@ -7,7 +7,8 @@ import (
 )
 
 var (
-	cheese string	= "Acapella"
+	// cheese string	= "Acapella"
+	cheese string	= "Brie"
 )
 
 func Shell(q bool) string {

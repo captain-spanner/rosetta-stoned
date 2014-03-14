@@ -44,6 +44,11 @@ type pentry struct {
 type pindexpq []*pentry
 
 type pdata struct {
+	value	[]byte
+}
+
+func (p *pdata) Content() []byte {
+	return p.value
 }
 
 func (*pdata) Describe() string {
@@ -51,10 +56,17 @@ func (*pdata) Describe() string {
 }
 
 func make_pdata(b []byte) part {
-	return new(pdata)
+	p := new(pdata)
+	p.value = b
+	return p
 }
 
 type pindex struct {
+	value	[]byte
+}
+
+func (p *pindex) Content() []byte {
+	return p.value
 }
 
 func (*pindex) Describe() string {
@@ -62,7 +74,9 @@ func (*pindex) Describe() string {
 }
 
 func make_pindex(b []byte) part {
-	return new(pindex)
+	p := new(pindex)
+	p.value = b
+	return p
 }
 
 // should allow other corpi than base
@@ -72,6 +86,9 @@ func part_get(p string, s string) (part, string, int) {
 		return nil, p + " is not a part", 1
 	}
 	c := base
+	if c == nil {
+		return nil, "base not set", 1
+	}
 	if c.pcaches == nil {
 		c.pcaches = make_pcache(c.parts)
 	}

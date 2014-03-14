@@ -145,9 +145,10 @@ func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
 	if message {
 		if e != 0 || p == nil {
 			fmt.Printf("%s: %s: not found\n", args[1], args[0])
-		} else {
-			fmt.Println("ok")
 		}
+	}
+	if message {
+		fmt.Printf("%s", string(p.Content()))
 	}
 	return strv(m), e
 }
