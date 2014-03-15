@@ -157,7 +157,8 @@ func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
 		}
 	} else {
 		if message {
-			fmt.Printf("%s", string(p.Content()))
+			// fmt.Printf("%s", string(p.Content()))
+			p.Print()
 		}
 	}
 	return strv(m), e

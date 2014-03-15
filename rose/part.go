@@ -75,12 +75,15 @@ func (p *pdata) Content() []byte {
 	return p.value
 }
 
+func (*pdata) Describe() string {
+	return "Data"
+}
+
 func (p *pdata) Error() string {
 	return p.error
 }
 
-func (*pdata) Describe() string {
-	return "Data"
+func (p *pdata) Print() {
 }
 
 func make_pdata(b []byte) part {
@@ -115,7 +118,7 @@ func make_pdata(b []byte) part {
 	ps := make([]*dptr, 0, pc)
 	for i := 0; i < pc; i++ {
 		if i == 0 {
-			p.ptroz = len(v[x+1])
+			p.ptroz = byte(len(v[x+1]))
 		}
 		ps = append(ps, make_dptr(v[x:x+4]))
 		x += 4
@@ -147,12 +150,19 @@ func (p *pindex) Content() []byte {
 	return p.value
 }
 
+func (*pindex) Describe() string {
+	return "Index"
+}
+
 func (p *pindex) Error() string {
 	return p.error
 }
 
-func (*pindex) Describe() string {
-	return "Index"
+func (p *pindex) Print() {
+	fmt.Printf("pos %c\n", p.pos)
+	fmt.Printf("rels:\n\t{%s }\n", chars_str(p.pvect))
+	fmt.Printf("offz %d\n", p.sensez)
+	fmt.Printf("senses:\n\t{%s }\n", uints_str(p.senses))
 }
 
 func make_pindex(b []byte) part {

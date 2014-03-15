@@ -134,3 +134,19 @@ func str_int(s string) int {
 func str_uint(s string) uint32 {
 	return uint32(str_int(s))
 }
+
+func chars_str(b []byte) string {
+	s := ""
+	for _, c := range b {
+		s += fmt.Sprintf(" %c", c)
+	}
+	return s
+}
+
+func uints_str(v []uint32) string {
+	s := ""
+	for _, u := range v {
+		s += fmt.Sprintf(" %d", u)
+	}
+	return s
+}

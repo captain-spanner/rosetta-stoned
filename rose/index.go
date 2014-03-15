@@ -19,6 +19,7 @@ type part interface {
 	Content() []byte
 	Describe() string
 	Error() string
+	Print()
 }
 
 type index struct {
