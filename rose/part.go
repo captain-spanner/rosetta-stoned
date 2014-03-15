@@ -2,6 +2,7 @@ package rose
 
 import (
 	"container/heap"
+	"fmt"
 )
 
 var (
@@ -43,12 +44,39 @@ type pentry struct {
 
 type pindexpq []*pentry
 
+type dptr struct {
+	tag	byte
+	pos	byte
+	index	uint32
+	ptr	uint32
+}
+
 type pdata struct {
 	value	[]byte
+	error	string
+	lex	int
+	pos	byte
+	ptroz	byte
+	words	[]string
+	ptrs	[]dptr
+	extra	[]string
+}
+
+func make_dptr(v []string) *dptr {
+	d := new(dptr)
+	d.tag = v[0][0]
+	d.index = str_uint(v[1])
+	d.pos = v[2][0]
+	d.ptr = str_uint(v[3])
+	return d
 }
 
 func (p *pdata) Content() []byte {
 	return p.value
+}
+
+func (p *pdata) Error() string {
+	return p.error
 }
 
 func (*pdata) Describe() string {
@@ -58,11 +86,57 @@ func (*pdata) Describe() string {
 func make_pdata(b []byte) part {
 	p := new(pdata)
 	p.value = b
+	v := smash_cmd(string(b))
+	l := len(v)
+	if l < 4 {
+		p.error = "short index"
+		return p
+	}
+	p.lex = str_int(v[0])
+	p.pos = v[1][0]
+	wc := str_int(v[2])
+	x := 3
+	if x + 2 * wc + 1 >= l {
+		p.error = "index too short for words"
+		return p
+	}
+	w := make([]string, 0, wc)
+	for i := 0; i < wc; i++ {
+		w = append(w, v[x])
+		x += 2
+	}
+	p.words = w
+	pc := str_int(v[x])
+	x++
+	if x + 4 * pc >= l {
+		p.error = "index too short for pointers"
+		return p
+	}
+	ps := make([]*dptr, 0, pc)
+	for i := 0; i < pc; i++ {
+		if i == 0 {
+			p.ptroz = len(v[x+1])
+		}
+		ps = append(ps, make_dptr(v[x:x+4]))
+		x += 4
+	}
+	if x < l {
+		if v[x][0] != '|' {
+			p.error = "| expected in index"
+			return p
+		}
+		x++
+		xz := l - x
+		xv := make([]string, xz, xz)
+		copy(xv, v[x:])
+		p.extra = xv
+	}
 	return p
 }
 
 type pindex struct {
 	value	[]byte
+	error	string
 	pos	byte
 	pvect	[]byte
 	sensez	int
@@ -73,18 +147,31 @@ func (p *pindex) Content() []byte {
 	return p.value
 }
 
+func (p *pindex) Error() string {
+	return p.error
+}
+
 func (*pindex) Describe() string {
 	return "Index"
 }
 
 func make_pindex(b []byte) part {
 	p := new(pindex)
-	b = bytes2x(b)
 	p.value = b
 	v := smash_cmd(string(b))
+	l := len(v)
+	if l < 3 + 2 {
+		p.error = "short index"
+		return p
+	}
 	p.pos = byte(v[0][0])
 	sz := str_int(v[1])
 	pz := str_int(v[2])
+	tz := 3 + pz + 2 + sz
+	if l != tz {
+		p.error = fmt.Sprintf("size mismatch - %d %d", l, tz)
+		return p
+	}
 	pv := make([]byte, pz, pz)
 	for i := 0; i < pz; i++ {
 		pv[i] = byte(v[3+i][0])

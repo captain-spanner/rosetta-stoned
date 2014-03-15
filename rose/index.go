@@ -18,6 +18,7 @@ const (
 type part interface {
 	Content() []byte
 	Describe() string
+	Error() string
 }
 
 type index struct {

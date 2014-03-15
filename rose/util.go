@@ -1,7 +1,6 @@
 package rose
 
 import (
-	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
@@ -44,21 +43,6 @@ func bvect_to_svect(dvect [][]byte) []string {
 		svect[i] = string(b)
 	}
 	return svect
-}
-
-func bytes2x(b []byte) []byte {
-	v := bytes.Split(b, []byte("  "))
-	if len(v) == 1 {
-		return v[0]
-	} else {
-		z := len(b) + 1
-		r := make([]byte, z, z)
-		l := len(v[0])
-		copy(r[:l], v[0])
-		copy(r[l:l+3], []byte(" X "))
-		copy(r[l+3:], v[1])
-		return r
-	}
 }
 
 func ws(c int) bool {

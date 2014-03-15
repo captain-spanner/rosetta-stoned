@@ -142,13 +142,23 @@ func cmd_message(argc int, args []string, cmdi cmdd) ([]string, int) {
 
 func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
 	p, m, e := part_get(args[0], args[1])
-	if message {
-		if e != 0 || p == nil {
-			fmt.Printf("%s: %s: not found\n", args[1], args[0])
+	if p != nil {
+		err := p.Error()
+		if err != "" {
+			if message {
+				fmt.Printf("%s: %s\n", args[1], err)
+			}
+			return strv(err), 1
 		}
 	}
-	if message {
-		fmt.Printf("%s", string(p.Content()))
+	if e != 0 || p == nil {
+		if message {
+			fmt.Printf("%s: %s: not found\n", args[1], args[0])
+		}
+	} else {
+		if message {
+			fmt.Printf("%s", string(p.Content()))
+		}
 	}
 	return strv(m), e
 }
