@@ -18,7 +18,11 @@ func Shell(q bool) string {
 		run_cmd("message on")
 		run_cmd("echo " + cheese + " shell")
 	}
-	r := bufio.NewReaderSize(os.Stdin, 8192)
+	return run(os.Stdin)
+}
+
+func run(f *os.File) string {
+	r := bufio.NewReaderSize(f, 8192)
 	for {
 		if interactive {
 			fmt.Printf("%s", prompt)

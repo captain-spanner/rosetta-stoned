@@ -182,6 +182,12 @@ func cmd_root(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return none, 0
 }
 
+func cmd_run(argc int, args []string, cmdi cmdd) ([]string, int) {
+//	f := args[0]
+//	glob_set("root", root)
+	return none, 0
+}
+
 func cmd_verbose(argc int, args []string, cmdi cmdd) ([]string, int) {
 	m, e := cmd_bool("verbose", argc, args, &verbose)
 	return m, e

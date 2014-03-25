@@ -23,7 +23,7 @@ const (
 	plimit	= 512
 )
 
-type pmaker func([]byte) part
+type pmaker func(partc, []byte) part
 
 type pcachev struct {
 	cmap	map[string]*pentry
@@ -45,10 +45,16 @@ type pentry struct {
 type pindexpq []*pentry
 
 type dptr struct {
-	tag	byte
+	tag	psd
 	pos	byte
 	index	uint32
 	ptr	uint32
+}
+
+type dframe struct {
+	kind	byte
+	xword	int
+	nwords	int
 }
 
 type pdata struct {
@@ -58,16 +64,25 @@ type pdata struct {
 	pos	byte
 	ptroz	byte
 	words	[]string
-	ptrs	[]dptr
+	ptrs	[]*dptr
+	frames	[]*dframe
 	extra	[]string
 }
 
-func make_dptr(v []string) *dptr {
+func make_dptr(v []string, m map[string]psd) *dptr {
 	d := new(dptr)
-	d.tag = v[0][0]
+	d.tag = m[v[0]]
 	d.index = str_uint(v[1])
 	d.pos = v[2][0]
 	d.ptr = str_uint(v[3])
+	return d
+}
+
+func make_dframe(v []string, m map[string]psd) *dframe {
+	d := new(dframe)
+	d.kind = v[0][0]
+	d.xword = str_intx(v[1])
+	d.nwords = str_intx(v[2])
 	return d
 }
 
@@ -86,7 +101,7 @@ func (p *pdata) Error() string {
 func (p *pdata) Print() {
 }
 
-func make_pdata(b []byte) part {
+func make_pdata(c partc, b []byte) part {
 	p := new(pdata)
 	p.value = b
 	v := smash_cmd(string(b))
@@ -115,17 +130,35 @@ func make_pdata(b []byte) part {
 		p.error = "index too short for pointers"
 		return p
 	}
-	ps := make([]*dptr, 0, pc)
+	m := psdmv[c]
+	ps := make([]*dptr, pc, pc)
 	for i := 0; i < pc; i++ {
 		if i == 0 {
 			p.ptroz = byte(len(v[x+1]))
 		}
-		ps = append(ps, make_dptr(v[x:x+4]))
+		ps[i] = make_dptr(v[x:x+4], m)
 		x += 4
+	}
+	p.ptrs = ps
+	if x == l {
+		return p
+	}
+	if v[x][0] != '|' {
+		fc := str_int(v[x])
+		x++
+		if x + 3*fc >= l {
+			p.error = "index too short for frames"
+		}
+		fs := make([]*dframe, fc, fc)
+		for i := 0; i < fc; i++ {
+			fs[i] = make_dframe(v[x:x+3], m)
+			x += 3
+		}
+		p.frames = fs
 	}
 	if x < l {
 		if v[x][0] != '|' {
-			p.error = "| expected in index"
+			p.error = "| expected"
 			return p
 		}
 		x++
@@ -141,7 +174,7 @@ type pindex struct {
 	value	[]byte
 	error	string
 	pos	byte
-	pvect	[]byte
+	pvect	[]psd
 	sensez	int
 	senses	[]uint32
 }
@@ -160,12 +193,12 @@ func (p *pindex) Error() string {
 
 func (p *pindex) Print() {
 	fmt.Printf("pos %c\n", p.pos)
-	fmt.Printf("rels:\n\t{%s }\n", chars_str(p.pvect))
+	fmt.Printf("rels:\n\t{%s }\n", psds_str(p.pvect))
 	fmt.Printf("offz %d\n", p.sensez)
-	fmt.Printf("senses:\n\t{%s }\n", uints_str(p.senses))
+	fmt.Printf("senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
 }
 
-func make_pindex(b []byte) part {
+func make_pindex(c partc, b []byte) part {
 	p := new(pindex)
 	p.value = b
 	v := smash_cmd(string(b))
@@ -182,9 +215,10 @@ func make_pindex(b []byte) part {
 		p.error = fmt.Sprintf("size mismatch - %d %d", l, tz)
 		return p
 	}
-	pv := make([]byte, pz, pz)
+	m := psdmv[c]
+	pv := make([]psd, pz, pz)
 	for i := 0; i < pz; i++ {
-		pv[i] = byte(v[3+i][0])
+		pv[i] = m[v[3+i]]
 	}
 	p.pvect = pv
 	o := 3 + pz + 2
@@ -224,7 +258,7 @@ func part_get(p string, s string) (part, string, int) {
 	if b == nil  {
 		return nil, s + ": not found", 1
 	}
-	r = pmakers[q](b)
+	r = pmakers[q](q, b)
 	k.put(s, r)
 	return r, "", 0
 }

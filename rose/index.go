@@ -165,6 +165,9 @@ func make_corpus(s string, opt string) (int, string) {
 	for _, f := range l {
 		p := s + "/" + f
 		e, m := make_index(p)
+		if message && m != "" {
+			fmt.Printf("%s: %s\n", p, m)
+		}
 		if m != "" {
 			return e, m
 		}

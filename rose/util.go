@@ -131,6 +131,15 @@ func str_int(s string) int {
 	}
 }
 
+func str_intx(s string) int {
+	i, err := strconv.ParseInt(s, 16, 32)
+	if err != nil {
+		return 0
+	} else {
+		return int(i)
+	}
+}
+
 func str_uint(s string) uint32 {
 	return uint32(str_int(s))
 }
@@ -143,10 +152,34 @@ func chars_str(b []byte) string {
 	return s
 }
 
+func psds_str(b []psd) string {
+	s := ""
+	for _, c := range b {
+		s += fmt.Sprintf(" %s", psds[c])
+	}
+	return s
+}
+
 func uints_str(v []uint32) string {
 	s := ""
 	for _, u := range v {
 		s += fmt.Sprintf(" %d", u)
+	}
+	return s
+}
+
+func uints_strz(v []uint32, z int) string {
+	s := ""
+	f := ""
+	for _, u := range v {
+		if z == 8 {
+			f = fmt.Sprintf(" %08d", u)
+		} else if z == 9 {
+			f = fmt.Sprintf(" %09d", u)
+		} else {
+			f = fmt.Sprintf(" %d", u)
+		}
+		s += f
 	}
 	return s
 }

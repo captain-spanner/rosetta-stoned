@@ -20,13 +20,17 @@ const (
 const (
 	pNone		= partc(iota)
 	pCl
+	pCr
 	pDj
 	pDn
 	pDr
 	pDv
+	pFs
+	pFv
 	pIj
 	pIn
 	pIr
+	pIs
 	pIv
 	pVn
 	pVs
@@ -94,6 +98,7 @@ const (
 	vAnt
 	vCau
 	vDer
+	vDom
 	vDsr
 	vDst
 	vDsu
@@ -169,7 +174,8 @@ vDer	+	Derivationally related form
 vDst	;c	Domain of synset - topic
 vDsr	;r	Domain of synset - region
 vDsu	;u	Domain of synset - usage
-
+// undocumented. assumed domain*
+Vdom	;	Domain of synset
 */
 
 var (
@@ -191,6 +197,7 @@ var (
 	}
 
 	partm map[string]partc	= map[string]partc {
+		// Princeton wordnet
 		"adj.exc":	pXj,
 		"adv.exc":	pXr,
 		"cntlist.rev":	pCl,
@@ -206,17 +213,27 @@ var (
 		"sentidx.vrb":	pVx,
 		"sents.vrb":	pVs,
 		"verb.exc":	pXv,
+
+		// extras from geo
+		"cntlist":	pCr,
+		"frames.vrb":	pFv,
+		"index.sense":	pIs,
+		"verb.Framestext": pFs,
 	}
 
 	parts map[partc]string	= map[partc]string {
 		pCl:	"Cl",
+		pCr:	"Cr",
 		pDj:	"Jd",
 		pDn:	"Nd",
 		pDr:	"Rd",
 		pDv:	"Vd",
+		pFs:	"Fs",
+		pFv:	"Fv",
 		pIj:	"Ji",
 		pIn:	"Ni",
 		pIr:	"Ri",
+		pIs:	"Is",
 		pIv:	"Vi",
 		pVn:	"Vn",
 		pVs:	"Vs",
@@ -228,23 +245,29 @@ var (
 
 	partt map[string]partc	= map[string]partc {
 		"Cl":	pCl,
+		"Cr":	pCr,
+		"Fs":	pFs,
+		"Fv":	pFv,
+		"Is":	pIs,
 		"Jd":	pDj,
-		"Nd":	pDn,
-		"Rd":	pDr,
-		"Vd":	pDv,
 		"Ji":	pIj,
+		"Jx":	pXj,
+		"Nd":	pDn,
 		"Ni":	pIn,
+		"Nx":	pXn,
+		"Rd":	pDr,
 		"Ri":	pIr,
+		"Rx":	pXr,
+		"Vd":	pDv,
 		"Vi":	pIv,
 		"Vn":	pVn,
 		"Vs":	pVs,
-		"Jx":	pXj,
-		"Nx":	pXn,
-		"Rx":	pXr,
 		"Vx":	pXv,
 	}
 
 	psds	[dMax]string = [dMax]string {
+		dNone:	"GOK",
+
 		rAnt:	"rAnt",
 		rDer:	"rDer",
 		rDsr:	"rDsr",
@@ -284,6 +307,7 @@ var (
 		vAnt:	"vAnt",
 		vCau:	"vCau",
 		vDer:	"vDer",
+		vDom:	"vDom",
 		vDsr:	"vDsr",
 		vDst:	"vDst",
 		vDsu:	"vDsu",
@@ -339,6 +363,7 @@ var (
 		vSee:	"See also",
 		vGRP:	"Verb Group",
 		vDer:	"Derivationally related form",
+		vDom:	"Domain of synset",
 		vDst:	"Domain of synset - topic",
 		vDsr:	"Domain of synset - region",
 		vDsu:	"Domain of synset - usage",
@@ -395,9 +420,21 @@ var (
 		"^":	vSee,
 		"$":	vGRP,
 		"+":	vDer,
+		";":	vDom,
 		";c":	vDst,
 		";r":	vDsr,
 		";u":	vDsu,
+	}
+
+	psdmv	[]map[string]psd = []map[string]psd {
+		pIj:	adjpsdm,
+		pIr:	advpsdm,
+		pIn:	nounpsdm,
+		pIv:	verbpsdm,
+		pDj:	adjpsdm,
+		pDr:	advpsdm,
+		pDn:	nounpsdm,
+		pDv:	verbpsdm,
 	}
 )
 
