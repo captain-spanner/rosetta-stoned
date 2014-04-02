@@ -183,8 +183,16 @@ func cmd_root(argc int, args []string, cmdi cmdd) ([]string, int) {
 }
 
 func cmd_run(argc int, args []string, cmdi cmdd) ([]string, int) {
-//	f := args[0]
-//	glob_set("root", root)
+	n := args[0]
+	f, m := fileopen(n, false)
+	if m != "" {
+		d := fmt.Sprintf("%s: %s", n, m)
+		if message {
+			fmt.Println(d)
+		}
+		return strv(d), 1
+	}
+	run(f)
 	return none, 0
 }
 

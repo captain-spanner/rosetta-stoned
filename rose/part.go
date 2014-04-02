@@ -71,7 +71,11 @@ type pdata struct {
 
 func make_dptr(v []string, m map[string]psd) *dptr {
 	d := new(dptr)
-	d.tag = m[v[0]]
+	t := m[v[0]]
+	if t == dNone && verbose {
+		fmt.Printf("unknown psd: %#q\n", v[0]) 
+	}
+	d.tag = t
 	d.index = str_uint(v[1])
 	d.pos = v[2][0]
 	d.ptr = str_uint(v[3])
@@ -99,6 +103,15 @@ func (p *pdata) Error() string {
 }
 
 func (p *pdata) Print() {
+	fmt.Printf("lex %d\n", p.lex)
+	fmt.Printf("pos %c\n", p.pos)
+	fmt.Printf("words %d\n", len(p.words))
+	for _, w := range p.words {
+		fmt.Printf("\t%q\n", w)
+	}
+	for _, d := range p.ptrs {
+		fmt.Printf("\t{ %s }\n", dptr_str(d))
+	}
 }
 
 func make_pdata(c partc, b []byte) part {
@@ -194,7 +207,6 @@ func (p *pindex) Error() string {
 func (p *pindex) Print() {
 	fmt.Printf("pos %c\n", p.pos)
 	fmt.Printf("rels:\n\t{%s }\n", psds_str(p.pvect))
-	fmt.Printf("offz %d\n", p.sensez)
 	fmt.Printf("senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
 }
 
@@ -218,7 +230,11 @@ func make_pindex(c partc, b []byte) part {
 	m := psdmv[c]
 	pv := make([]psd, pz, pz)
 	for i := 0; i < pz; i++ {
-		pv[i] = m[v[3+i]]
+		t := m[v[3+i]]
+		if t == dNone && verbose {
+			fmt.Printf("unknown psd: %#q\n", v[3+i]) 
+		}
+		pv[i] = t
 	}
 	p.pvect = pv
 	o := 3 + pz + 2

@@ -447,5 +447,6 @@ func init() {
 		fmt.Println("Init...")
 	}
 	init_syms()
+	init_cmds()
 	configure()
 }

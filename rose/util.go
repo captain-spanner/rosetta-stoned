@@ -160,6 +160,10 @@ func psds_str(b []psd) string {
 	return s
 }
 
+func dptr_str(d *dptr) string {
+	return fmt.Sprintf("%s %08d %c %d", psds[d.tag], d.index, d.pos, d.ptr)
+}
+
 func uints_str(v []uint32) string {
 	s := ""
 	for _, u := range v {
