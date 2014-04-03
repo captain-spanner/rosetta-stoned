@@ -140,7 +140,7 @@ func cmd_message(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return m, e
 }
 
-func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
+func fetch_part(args []string) (part, []string, int) {
 	p, m, e := part_get(args[0], args[1])
 	if p != nil {
 		err := p.Error()
@@ -148,20 +148,36 @@ func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
 			if message {
 				fmt.Printf("%s: %s\n", args[1], err)
 			}
-			return strv(err), 1
+			return nil, strv(err), 1
 		}
 	}
+	return p, strv(m), e
+}
+
+func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
+	p, m, e := fetch_part(args)
 	if e != 0 || p == nil {
 		if message {
 			fmt.Printf("%s: %s: not found\n", args[1], args[0])
 		}
 	} else {
 		if message {
-			// fmt.Printf("%s", string(p.Content()))
 			p.Print()
 		}
 	}
-	return strv(m), e
+	return m, e
+}
+
+func cmd_pop(argc int, args []string, cmdi cmdd) ([]string, int) {
+	p, m, e := fetch_part(args)
+	if e != 0 || p == nil {
+		if message {
+			fmt.Printf("%s: %s: not found\n", args[1], args[0])
+		}
+		return m, e
+	}
+	v, e := p.Populate(args[0])
+	return v, e
 }
 
 func cmd_root(argc int, args []string, cmdi cmdd) ([]string, int) {

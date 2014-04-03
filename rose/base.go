@@ -319,6 +319,8 @@ var (
 	}
 
 	psdd	[dMax]string = [dMax]string {
+		dNone:	"Unknown",
+
 		rAnt:	"Antonym",
 		rDer:	"Derived from adjective",
 		rDst:	"Domain of synset - topic",

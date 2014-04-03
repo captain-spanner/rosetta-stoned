@@ -71,6 +71,7 @@ func init_cmds() {
 		"interactive":	{ cmd_interactive, 0, 1, "interactive [ <bool> ]", "manage interactive" },
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]", "manage message" },
 		"part":		{ cmd_part, 2, 2, "part <index> <word>", "get part of speach" },
+		"pop":		{ cmd_pop, 2, 2, "pop <index> <word>", "populate part of speach" },
 		"run":		{ cmd_run, 1, 1, "run <file>", "run commands from a file" },
 		"root":		{ cmd_root, 1, 1, "root <directory>", "set root" },
 		"verbose":	{ cmd_verbose, 0, 1, "verbose [ <bool> ]", "manage verbose" },

@@ -161,7 +161,7 @@ func psds_str(b []psd) string {
 }
 
 func dptr_str(d *dptr) string {
-	return fmt.Sprintf("%s %08d %c %d", psds[d.tag], d.index, d.pos, d.ptr)
+	return fmt.Sprintf("%s %08d %c %d", psdd[d.tag], d.index, d.pos, d.ptr)
 }
 
 func uints_str(v []uint32) string {
@@ -172,18 +172,20 @@ func uints_str(v []uint32) string {
 	return s
 }
 
+func uint_strz(u uint32, z int) string {
+	if z == 8 {
+		return fmt.Sprintf("%08d", u)
+	} else if z == 9 {
+		return fmt.Sprintf("%09d", u)
+	} else {
+		return fmt.Sprintf("%d", u)
+	}
+}
+
 func uints_strz(v []uint32, z int) string {
 	s := ""
-	f := ""
 	for _, u := range v {
-		if z == 8 {
-			f = fmt.Sprintf(" %08d", u)
-		} else if z == 9 {
-			f = fmt.Sprintf(" %09d", u)
-		} else {
-			f = fmt.Sprintf(" %d", u)
-		}
-		s += f
+		s += " " + uint_strz(u, z)
 	}
 	return s
 }

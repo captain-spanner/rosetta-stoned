@@ -102,6 +102,10 @@ func (p *pdata) Error() string {
 	return p.error
 }
 
+func (p *pdata) Populate(path string) ([]string, int) {
+	return none, 0
+}
+
 func (p *pdata) Print() {
 	fmt.Printf("lex %d\n", p.lex)
 	fmt.Printf("pos %c\n", p.pos)
@@ -190,6 +194,7 @@ type pindex struct {
 	pvect	[]psd
 	sensez	int
 	senses	[]uint32
+	sensep	[]part
 }
 
 func (p *pindex) Content() []byte {
@@ -204,10 +209,41 @@ func (p *pindex) Error() string {
 	return p.error
 }
 
+func (p *pindex) Populate(path string) ([]string, int) {
+	// fix this
+	b := []byte(path)
+	b[len(b)-1] = 'd'
+	path = string(b)
+	if verbose {
+		fmt.Printf("path = %d\n", path)
+	}
+	z := len(p.senses)
+	v := make([]part, z, z)
+	errs := 0
+	mesgs := none
+	for i, s := range p.senses {
+		r, m, e := part_get(path, uint_strz(s, p.sensez))
+		if e != 0 {
+			errs++
+			mesgs = append(mesgs, m)
+		} else {
+			v[i] = r
+		}
+	}
+	p.sensep = v
+	if errs != 0 && message {
+		fmt.Printf("errors: %d\n", errs)
+	}
+	return mesgs, errs
+}
+
 func (p *pindex) Print() {
 	fmt.Printf("pos %c\n", p.pos)
 	fmt.Printf("rels:\n\t{%s }\n", psds_str(p.pvect))
 	fmt.Printf("senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
+	if p.sensep != nil {
+		fmt.Println("Populated")
+	}
 }
 
 func make_pindex(c partc, b []byte) part {
