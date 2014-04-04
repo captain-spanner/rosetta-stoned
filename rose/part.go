@@ -360,7 +360,7 @@ func (c *pcachev) put(s string, p part) {
 		c.count++
 	} else {
 		// LRU
-		o := heap.Pop(c.queue).(*entry)
+		o := heap.Pop(c.queue).(*pentry)
 		delete(c.cmap, o.key)
 		heap.Push(c.queue, e)
 	}

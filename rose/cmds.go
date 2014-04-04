@@ -208,7 +208,12 @@ func cmd_run(argc int, args []string, cmdi cmdd) ([]string, int) {
 		}
 		return strv(d), 1
 	}
+	i := interactive
+	interactive = false
+	glob_flag("interactive", false)
 	run(f)
+	interactive = i
+	glob_flag("interactive", i)
 	return none, 0
 }
 
