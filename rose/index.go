@@ -19,7 +19,7 @@ type part interface {
 	Content() []byte
 	Describe() string
 	Error() string
-	Populate(string) ([]string, int)
+	Populate(int) ([]string, int)
 	Print()
 }
 

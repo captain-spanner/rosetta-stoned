@@ -8,7 +8,8 @@ import (
 
 var (
 	// cheese string	= "Acapella"
-	cheese string	= "Brie"
+	// cheese string	= "Brie"
+	cheese string	= "Camembert"
 )
 
 func Shell(q bool) string {

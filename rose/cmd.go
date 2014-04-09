@@ -144,5 +144,10 @@ func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {
 			return
 		}
 	}
+	if argc < cmdf.min || (cmdf.max >= 0 && argc > cmdf.max) {
+		fmt.Println("usage:", cmdf.usage)
+		err = 1
+		return
+	}
 	return cmdf.cmd(argc, args, cmdi)
 }

@@ -176,7 +176,7 @@ func cmd_pop(argc int, args []string, cmdi cmdd) ([]string, int) {
 		}
 		return m, e
 	}
-	v, e := p.Populate(args[0])
+	v, e := p.Populate(2)
 	return v, e
 }
 

@@ -18,6 +18,14 @@ const (
 )
 
 const (
+	WIT		= partd(iota)
+	Adjective
+	Adverb
+	Noun
+	Verb
+)
+
+const (
 	pNone		= partc(iota)
 	pCl
 	pCr
@@ -194,6 +202,23 @@ var (
 		hHashed:	"hashed",
 		hIndexed:	"indexed",
 		hLiteral:	"literal",
+	}
+
+	posm map[byte]partd	= map[byte]partd {
+		'a':	Adjective,
+		'r':	Adverb,
+		'n':	Noun,
+		'v':	Verb,
+		's':	Adjective,	// what is this?
+		'j':	Adjective,	// maybe not needed
+	}
+
+	poss map[partd]string	= map[partd]string {
+		WIT:		"What?",
+		Adjective:	"Adjective",
+		Adverb:		"Adverb",
+		Noun:		"Noun",
+		Verb:		"Verb",
 	}
 
 	partm map[string]partc	= map[string]partc {
@@ -427,6 +452,20 @@ var (
 		";r":	vDsr,
 		";u":	vDsu,
 	}
+	
+	posdx	[]string = []string {
+		Adjective:	"Jd",
+		Adverb:		"Rd",
+		Noun:		"Nd",
+		Verb:		"Vd",
+	}
+	
+	posmv	[]map[string]psd = []map[string]psd {
+		Adjective:	adjpsdm,
+		Adverb:		advpsdm,
+		Noun:		nounpsdm,
+		Verb:		verbpsdm,
+	}
 
 	psdmv	[]map[string]psd = []map[string]psd {
 		pIj:	adjpsdm,
@@ -442,6 +481,7 @@ var (
 
 type hashc int
 type partc int
+type partd byte
 type psd byte
 
 func init() {

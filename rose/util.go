@@ -161,7 +161,7 @@ func psds_str(b []psd) string {
 }
 
 func dptr_str(d *dptr) string {
-	return fmt.Sprintf("%s %08d %c %d", psdd[d.tag], d.index, d.pos, d.ptr)
+	return fmt.Sprintf("%s %08d %s %d", psds[d.tag], d.index, poss[d.pos], d.ptr)
 }
 
 func uints_str(v []uint32) string {

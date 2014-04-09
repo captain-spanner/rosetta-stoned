@@ -46,7 +46,7 @@ type pindexpq []*pentry
 
 type dptr struct {
 	tag	psd
-	pos	byte
+	pos	partd
 	index	uint32
 	ptr	uint32
 }
@@ -61,10 +61,11 @@ type pdata struct {
 	value	[]byte
 	error	string
 	lex	int
-	pos	byte
+	pos	partd
 	ptroz	byte
 	words	[]string
 	ptrs	[]*dptr
+	ptrp	[]part
 	frames	[]*dframe
 	extra	[]string
 }
@@ -76,10 +77,22 @@ func make_dptr(v []string, m map[string]psd) *dptr {
 		fmt.Printf("unknown psd: %#q\n", v[0]) 
 	}
 	d.tag = t
+	s := v[2][0]
+	ps, f := posm[s]
+	if !f {
+		fmt.Printf("bad pos '%c'", s)
+		return nil
+	}
+	d.pos = ps
 	d.index = str_uint(v[1])
-	d.pos = v[2][0]
 	d.ptr = str_uint(v[3])
 	return d
+}
+
+func (d *dptr) pop_dptr(r int, z int) (part, string, int) {
+	dpart := posdx[d.pos]
+	v, m, e := part_get(dpart, uint_strz(d.index, z))
+	return v, m, e
 }
 
 func make_dframe(v []string, m map[string]psd) *dframe {
@@ -102,19 +115,41 @@ func (p *pdata) Error() string {
 	return p.error
 }
 
-func (p *pdata) Populate(path string) ([]string, int) {
-	return none, 0
+func (p *pdata) Populate(r int) ([]string, int) {
+	if r == 0 || p.ptrp != nil {
+		return none, 0
+	}
+	z := len(p.ptrs)
+	v := make([]part, z, z)
+	p.ptrp = v
+	errs := 0
+	mesgs := none
+	oz := int(p.ptroz)
+	r--
+	for i, d := range p.ptrs {
+		r, m, e := d.pop_dptr(r, oz)
+		if e != 0 {
+			errs++
+			mesgs = append(mesgs, m)
+		} else {
+			v[i] = r
+		}
+	}
+	return mesgs, errs
 }
 
 func (p *pdata) Print() {
 	fmt.Printf("lex %d\n", p.lex)
-	fmt.Printf("pos %c\n", p.pos)
+	fmt.Printf("pos %s\n", poss[p.pos])
 	fmt.Printf("words %d\n", len(p.words))
 	for _, w := range p.words {
 		fmt.Printf("\t%q\n", w)
 	}
 	for _, d := range p.ptrs {
 		fmt.Printf("\t{ %s }\n", dptr_str(d))
+	}
+	if p.ptrp != nil {
+		fmt.Println("Populated")
 	}
 }
 
@@ -128,7 +163,13 @@ func make_pdata(c partc, b []byte) part {
 		return p
 	}
 	p.lex = str_int(v[0])
-	p.pos = v[1][0]
+	s := v[1][0]
+	ps, f := posm[s]
+	if !f {
+		p.error = fmt.Sprintf("bad pos '%c'", s)
+		return p
+	}
+	p.pos = ps
 	wc := str_int(v[2])
 	x := 3
 	if x + 2 * wc + 1 >= l {
@@ -147,20 +188,21 @@ func make_pdata(c partc, b []byte) part {
 		p.error = "index too short for pointers"
 		return p
 	}
-	m := psdmv[c]
-	ps := make([]*dptr, pc, pc)
+	ptrs := make([]*dptr, pc, pc)
+	psm := posmv[p.pos]
 	for i := 0; i < pc; i++ {
 		if i == 0 {
 			p.ptroz = byte(len(v[x+1]))
 		}
-		ps[i] = make_dptr(v[x:x+4], m)
+		ptrs[i] = make_dptr(v[x:x+4], psm)
 		x += 4
 	}
-	p.ptrs = ps
+	p.ptrs = ptrs
 	if x == l {
 		return p
 	}
 	if v[x][0] != '|' {
+		m := psdmv[c]
 		fc := str_int(v[x])
 		x++
 		if x + 3*fc >= l {
@@ -190,7 +232,7 @@ func make_pdata(c partc, b []byte) part {
 type pindex struct {
 	value	[]byte
 	error	string
-	pos	byte
+	pos	partd
 	pvect	[]psd
 	sensez	int
 	senses	[]uint32
@@ -209,28 +251,26 @@ func (p *pindex) Error() string {
 	return p.error
 }
 
-func (p *pindex) Populate(path string) ([]string, int) {
-	// fix this
-	b := []byte(path)
-	b[len(b)-1] = 'd'
-	path = string(b)
-	if verbose {
-		fmt.Printf("path = %d\n", path)
+func (p *pindex) Populate(r int) ([]string, int) {
+	if r == 0 || p.sensep != nil {
+		return none, 0
 	}
+	dpart := posdx[p.pos]
 	z := len(p.senses)
 	v := make([]part, z, z)
+	p.sensep = v
 	errs := 0
 	mesgs := none
 	for i, s := range p.senses {
-		r, m, e := part_get(path, uint_strz(s, p.sensez))
+		t, m, e := part_get(dpart, uint_strz(s, p.sensez))
 		if e != 0 {
 			errs++
 			mesgs = append(mesgs, m)
 		} else {
-			v[i] = r
+			v[i] = t
+			t.Populate(r)
 		}
 	}
-	p.sensep = v
 	if errs != 0 && message {
 		fmt.Printf("errors: %d\n", errs)
 	}
@@ -238,7 +278,7 @@ func (p *pindex) Populate(path string) ([]string, int) {
 }
 
 func (p *pindex) Print() {
-	fmt.Printf("pos %c\n", p.pos)
+	fmt.Printf("pos %s\n", poss[p.pos])
 	fmt.Printf("rels:\n\t{%s }\n", psds_str(p.pvect))
 	fmt.Printf("senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
 	if p.sensep != nil {
@@ -255,7 +295,13 @@ func make_pindex(c partc, b []byte) part {
 		p.error = "short index"
 		return p
 	}
-	p.pos = byte(v[0][0])
+	s := byte(v[0][0])
+	ps, f := posm[s]
+	if !f {
+		p.error = fmt.Sprintf("bad pos '%c'", s)
+		return p
+	}
+	p.pos = ps
 	sz := str_int(v[1])
 	pz := str_int(v[2])
 	tz := 3 + pz + 2 + sz
