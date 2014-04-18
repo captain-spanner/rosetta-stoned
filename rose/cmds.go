@@ -169,6 +169,13 @@ func cmd_part(argc int, args []string, cmdi cmdd) ([]string, int) {
 }
 
 func cmd_pop(argc int, args []string, cmdi cmdd) ([]string, int) {
+	r := 1
+	if argc == 3 {
+		t := str_int(args[2])
+		if t > 0 {
+			r = t
+		}
+	}
 	p, m, e := fetch_part(args)
 	if e != 0 || p == nil {
 		if message {
@@ -176,7 +183,7 @@ func cmd_pop(argc int, args []string, cmdi cmdd) ([]string, int) {
 		}
 		return m, e
 	}
-	v, e := p.Populate(2)
+	v, e := p.Populate(r)
 	return v, e
 }
 

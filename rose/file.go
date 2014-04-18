@@ -39,6 +39,20 @@ func readlines(file *os.File) ([]string, string) {
 	return bvect_to_svect(dvect), ""
 }
 
+func readwordlist(p string) []string {
+	w := p + "/" + wordlist
+	file, err := fileopen(w, false)
+	if err != "" {
+		return nil
+	}
+	data, err := readfileb(file)
+	if err != "" {
+		return nil
+	}
+	dvect := bytes.Split(data, newline)
+	return bvect_to_svect(dvect)
+}
+
 func checkdir(s string) string {
 	f, err := fileopen(s, true)
 	if f != nil {

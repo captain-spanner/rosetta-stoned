@@ -20,7 +20,7 @@ var (
 )
 
 const (
-	plimit	= 512
+	plimit	= 1024 * 1024
 )
 
 type pmaker func(partc, []byte) part
@@ -66,6 +66,7 @@ type pdata struct {
 	words	[]string
 	ptrs	[]*dptr
 	ptrp	[]part
+	rec	int
 	frames	[]*dframe
 	extra	[]string
 }
@@ -92,6 +93,9 @@ func make_dptr(v []string, m map[string]psd) *dptr {
 func (d *dptr) pop_dptr(r int, z int) (part, string, int) {
 	dpart := posdx[d.pos]
 	v, m, e := part_get(dpart, uint_strz(d.index, z))
+	if v != nil {
+		v.Populate(r)
+	}
 	return v, m, e
 }
 
@@ -116,23 +120,32 @@ func (p *pdata) Error() string {
 }
 
 func (p *pdata) Populate(r int) ([]string, int) {
-	if r == 0 || p.ptrp != nil {
+	if r <= p.rec {
 		return none, 0
 	}
-	z := len(p.ptrs)
-	v := make([]part, z, z)
-	p.ptrp = v
+	p.rec = r
+	r--
 	errs := 0
 	mesgs := none
-	oz := int(p.ptroz)
-	r--
-	for i, d := range p.ptrs {
-		r, m, e := d.pop_dptr(r, oz)
-		if e != 0 {
-			errs++
-			mesgs = append(mesgs, m)
-		} else {
-			v[i] = r
+	if p.ptrp == nil {
+		z := len(p.ptrs)
+		v := make([]part, z, z)
+		p.ptrp = v
+		oz := int(p.ptroz)
+		for i, d := range p.ptrs {
+			t, m, e := d.pop_dptr(r, oz)
+			if e != 0 {
+				errs++
+				mesgs = append(mesgs, m)
+			} else {
+				v[i] = t
+			}
+		}
+	} else {
+		for _, t := range p.ptrp {
+			if t != nil {
+				t.Populate(r)
+			}
 		}
 	}
 	return mesgs, errs
@@ -252,27 +265,36 @@ func (p *pindex) Error() string {
 }
 
 func (p *pindex) Populate(r int) ([]string, int) {
-	if r == 0 || p.sensep != nil {
+	if r == 0 {
 		return none, 0
 	}
-	dpart := posdx[p.pos]
-	z := len(p.senses)
-	v := make([]part, z, z)
-	p.sensep = v
 	errs := 0
 	mesgs := none
-	for i, s := range p.senses {
-		t, m, e := part_get(dpart, uint_strz(s, p.sensez))
-		if e != 0 {
-			errs++
-			mesgs = append(mesgs, m)
-		} else {
-			v[i] = t
-			t.Populate(r)
+	if p.sensep == nil {
+		dpart := posdx[p.pos]
+		z := len(p.senses)
+		v := make([]part, z, z)
+		p.sensep = v
+		for i, s := range p.senses {
+			t, m, e := part_get(dpart, uint_strz(s, p.sensez))
+			if e != 0 {
+				errs++
+				mesgs = append(mesgs, m)
+			} else {
+				v[i] = t
+				t.Populate(r)
+			}
 		}
-	}
-	if errs != 0 && message {
-		fmt.Printf("errors: %d\n", errs)
+		if errs != 0 && message {
+			fmt.Printf("errors: %d\n", errs)
+		}
+	} else {
+		for _, t := range p.sensep {
+			if t != nil {
+				t.Populate(r)
+			}
+		}
+			
 	}
 	return mesgs, errs
 }

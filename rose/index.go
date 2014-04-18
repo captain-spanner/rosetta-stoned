@@ -10,6 +10,8 @@ var (
 	indexv	[]*index = make([]*index , 0, 0)
 	indexr	map[string]string = make(map[string]string)
 	corpi	[]*corpus = make([]*corpus , 0, 0)
+
+	wordlist string = "«words»"
 )
 
 const (
@@ -36,6 +38,7 @@ type index struct {
 	imapz	int
 	cache	indexer
 	fetch	fetchf
+	words	map[string]bool
 	ok	bool
 }
 
@@ -96,6 +99,15 @@ func (ix *index) decode_fmt() bool {
 	return true
 }
 
+func read_words(p string) map[string]bool {
+	v := readwordlist(p)
+	m := make(map[string]bool)
+	for _, w := range v {
+		m[w] = true
+	}
+	return m
+}
+
 func make_index(s string) (int, string) {
 	ix := new(index)
 	ix.ok = true
@@ -137,6 +149,7 @@ func make_index(s string) (int, string) {
 		}
 		ix.cache = make_indexer(ix.count)
 	}
+	ix.words = read_words(p)
 	indexm[s] = ix
 	indexv = append(indexv, ix)
 	indexr[s] = s
@@ -164,6 +177,9 @@ func make_corpus(s string, opt string) (int, string) {
 		l = append(l, x.Name())
 	}
 	for _, f := range l {
+		if f == wordlist {
+			continue
+		}
 		p := s + "/" + f
 		e, m := make_index(p)
 		if message && m != "" {
