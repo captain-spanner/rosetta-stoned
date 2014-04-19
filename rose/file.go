@@ -2,6 +2,7 @@ package rose
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 )
@@ -43,10 +44,12 @@ func readwordlist(p string) []string {
 	w := p + "/" + wordlist
 	file, err := fileopen(w, false)
 	if err != "" {
+fmt.Printf("no %s\n", w)
 		return nil
 	}
 	data, err := readfileb(file)
 	if err != "" {
+fmt.Printf("error reading %s\n", w)
 		return nil
 	}
 	dvect := bytes.Split(data, newline)

@@ -43,13 +43,17 @@ type index struct {
 }
 
 func (ix *index) print_index() string {
-	return fmt.Sprintf("%8d%10s%5d%6t  %s",
-		ix.count, hashes[ix.hash], ix.arg, ix.ok, ix.name)
+	w := "-"
+	if ix.words != nil {
+		w = fmt.Sprintf("%d", len(ix.words))
+	}
+	return fmt.Sprintf("%8d%10s%5d%6t%7s  %s",
+		ix.count, hashes[ix.hash], ix.arg, ix.ok, w, ix.name)
 }
 
 func print_header() {
-	fmt.Printf("%8s%10s%5s%6s  %s\n",
-		"Count", "Encoding", "Arg", "Ready", "Name")
+	fmt.Printf("%8s%10s%5s%6s%7s  %s\n",
+		"Count", "Encoding", "Arg", "Ready", "Words", "Name")
 }
 
 func print_indexes() []string {
@@ -101,6 +105,9 @@ func (ix *index) decode_fmt() bool {
 
 func read_words(p string) map[string]bool {
 	v := readwordlist(p)
+	if v == nil {
+		return nil
+	}
 	m := make(map[string]bool)
 	for _, w := range v {
 		m[w] = true
