@@ -229,6 +229,11 @@ func cmd_verbose(argc int, args []string, cmdi cmdd) ([]string, int) {
 	return m, e
 }
 
+func cmd_word(argc int, args []string, cmdi cmdd) ([]string, int) {
+	list_ixword(args[0])
+	return nil, 0
+}
+
 func cmd_xeq(argc int, args []string, cmdi cmdd) ([]string, int) {
 	m, e := cmd_bool("xeq", argc, args, &xeq)
 	return m, e

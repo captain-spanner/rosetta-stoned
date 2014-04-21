@@ -78,6 +78,18 @@ func print_indexes() []string {
 	return v
 }
 
+func list_ixword(w string) {
+	for _, x := range indexm {
+		m := x.words
+		if m == nil {
+			continue
+		}
+		if m[w] {
+			fmt.Println(x.name)
+		}
+	}
+}
+
 func (ix *index) decode_fmt() bool {
 	v := smash_cmd(ix.format)
 	ix.hash = hError
@@ -122,6 +134,9 @@ func make_index(s string) (int, string) {
 	p := root + "/" + s
 	m := checkdir(p)
 	if m != "" {
+		if message {
+			fmt.Printf("%s: %s\n", s, m)
+		}
 		return 1, m
 	}
 	ix.path = p
