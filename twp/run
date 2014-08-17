@@ -1,0 +1,9 @@
+#!/bin/rc
+
+go run log7_10.go > log7_10.vhh
+go run log8_12.go > log8_12.vhh
+go run log10_14d.go > log10_14d.vhh
+go run freq16_l.go > freq16_l.vhh
+go run freq16_h.go > freq16_h.vhh
+go run shape8th8.go > shape8th8.vhh
+go run triangle8.go > triangle8.vhh
