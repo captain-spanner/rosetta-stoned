@@ -5,7 +5,7 @@ import (
 )
 
 type req struct {
-	cmd	func(int, []string, cmdd) ([]string, int)
+	cmd	func (int, []string, cmdd, *Petal) ([]string, int)
 	min	int
 	max	int
 	usage	string
@@ -60,8 +60,9 @@ func init_cmds() {
 		"?":		{ cmd_help, 0, -1, "help", "help" },
 		"#":		{ cmd_comment, 0, -1, "# comment until end of line", "comment" },
 		"//":		{ cmd_comment, 0, -1, "// comment until end of line", "comment" },
-		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]", "manage collections" },
-		"corpus":	{ cmd_corpus, 0, 2, "corpus [ <name> [ <option> ] ]", "manage corpi" },
+		"base":		{ cmd_base, 0, 1, "base <name>", "set base corpus" },		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]", "manage collections" },
+		"corpi":	{ cmd_corpi, 0, 0, "corpi", "list corpi" },
+		"corpus":	{ cmd_corpus, 1, 1, "corpus <name>", "add corpus" },
 		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]", "manage debug" },
 		"echo":		{ cmd_echo, 0, -1, "echo any stuff blah blah", "echo arguments" },
 		"get":		{ cmd_get, 2, 2, "get <index> <word>", "get data" },
@@ -69,6 +70,7 @@ func init_cmds() {
 		"help":		{ cmd_help, 0, -1, "help", "help" },
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]", "manage indexes" },
 		"interactive":	{ cmd_interactive, 0, 1, "interactive [ <bool> ]", "manage interactive" },
+		"lookup":	{ cmd_lookup, 1, 2, "lookup <word> [ <option> ]", "lookup word is base corpus" },
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]", "manage message" },
 		"part":		{ cmd_part, 2, 2, "part <index> <word>", "get part of speach" },
 		"pop":		{ cmd_pop, 2, 3, "pop <index> <word> [ <depth> ]", "populate part of speach" },
@@ -84,17 +86,17 @@ func (c *cmdb) Die() bool {
 	return c.die
 }
 
-func Run_cmd(args []string) ([]string, int) {
-	return run_cmdx(len(args), args, cmdf)
+func Run_cmd(args []string, rose *Petal) ([]string, int) {
+	return run_cmdx(len(args), args, cmdf, rose)
 }
 
-func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, errv []int) {
+func Run_cmds(vect [][]string, src string, die bool, rose *Petal) (ret [][]string, errc int, errv []int) {
 	ret = make([][]string, 0)
 	errc = 0
 	errv = make([]int, 0)
 	for i, args := range vect {
 		cmd := &cmdv{ src: src, index: i + 1, die: die }
-		r, e := run_cmdx(len(args), args, cmd)
+		r, e := run_cmdx(len(args), args, cmd, rose)
 		ret = append(ret, r)
 		errc += e
 		errv = append(errv, e)
@@ -102,20 +104,20 @@ func Run_cmds(vect [][]string, src string, die bool) (ret [][]string, errc int, 
 	return
 }
 
-func run_cmd(s string) ([]string, int) {
+func run_cmd(s string, rose *Petal) ([]string, int) {
 	args := smash_cmd(s)
-	v, e := Run_cmd(args)
+	v, e := Run_cmd(args, rose)
 	return v, e
 }
 
-func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {
+func run_cmdx(argc int, args []string, cmdi cmdd, rose *Petal) (ret []string, err int) {
 	ret = none
 	err = 0
 	if argc == 0 {
 		return
 	}
 	if xeq {
-		cmd_echo(argc, args, cmdi)
+		cmd_echo(argc, args, cmdi, rose)
 	}
 	cmd := args[0]
 	set := false
@@ -150,5 +152,5 @@ func run_cmdx(argc int, args []string, cmdi cmdd) (ret []string, err int) {
 		err = 1
 		return
 	}
-	return cmdf.cmd(argc, args, cmdi)
+	return cmdf.cmd(argc, args, cmdi, rose)
 }

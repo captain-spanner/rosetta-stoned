@@ -10,11 +10,10 @@ var (
 	indexv	[]*index = make([]*index , 0, 0)
 	indexr	map[string]string = make(map[string]string)
 	corpi	[]*corpus = make([]*corpus , 0, 0)
-
-	wordlist string = "«words»"
 )
 
 const (
+	wordlist string = "«words»"
 )
 
 type part interface {
@@ -185,7 +184,7 @@ type corpus struct {
 	pcaches	*pcache
 }
 
-func make_corpus(s string, opt string) (int, string) {
+func make_corpus(s string) (int, string) {
 	c := new(corpus)
 	c.name = s
 	c.base = false
@@ -212,9 +211,6 @@ func make_corpus(s string, opt string) (int, string) {
 		}
 	}
 	isbase := false
-	if opt == "base" {
-		isbase = true
-	}
 	e := 0
 	m := ""
 	if isbase {

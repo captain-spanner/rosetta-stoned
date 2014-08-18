@@ -15,5 +15,5 @@ func configure() {
 		fatal(Config, 0, m)
 	}
 	vargs := wordlists(vect)
-	Run_cmds(vargs, Config, true)
+	Run_cmds(vargs, Config, true, new(Petal))
 }
