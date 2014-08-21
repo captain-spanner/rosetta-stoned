@@ -9,7 +9,8 @@ import (
 var (
 	// cheese string	= "Acapella"
 	// cheese string	= "Brie"
-	cheese string	= "Camembert"
+	// cheese string	= "Camembert"
+	cheese string	= "Danablu"
 )
 
 func Shell(q bool, rose *Petal) string {

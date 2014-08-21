@@ -4,6 +4,10 @@ import (
 	"os"
 )
 
+var (
+	confp	*Petal
+)
+
 func configure() {
 	sf, err := os.Open(Config)
 	if err != nil {

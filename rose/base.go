@@ -488,6 +488,7 @@ func init() {
 	if debug {
 		fmt.Println("Init...")
 	}
+	go petalsrv()
 	init_syms()
 	init_cmds()
 	configure()
