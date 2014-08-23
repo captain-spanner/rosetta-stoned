@@ -5,7 +5,7 @@ import (
 )
 
 var (
-	confp	*Petal
+	Confp	*Petal
 )
 
 func configure() {
@@ -14,10 +14,10 @@ func configure() {
 		fatal(Config, 0, "open config failed")
 	}
 	defer sf.Close()
-	vect, m := readlines(sf)
-	if m != "" {
-		fatal(Config, 0, m)
+	Confp = MkPetal("Config", sf, os.Stdout, os.Stderr, nil)
+	Confp.prompt = ">> "
+	mesg := Confp.XeqPetal()
+	if mesg != "" {
+		fatal(Config, 0, mesg)
 	}
-	vargs := wordlists(vect)
-	Run_cmds(vargs, Config, true, new(Petal))
 }

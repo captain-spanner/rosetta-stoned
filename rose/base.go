@@ -189,13 +189,14 @@ Vdom	;	Domain of synset
 var (
 	root	string
 	base	*corpus
+	fine	chan bool = make(chan bool)
 
 	debug bool		= false
 	message bool		= true
 	verbose bool		= true
-	xeq bool		= false
-	interactive		= false
-	prompt			= ">> "
+//	xeq bool		= false
+//	interactive		= false
+//	prompt			= ">> "
 
 	hashes map[hashc]string	= map[hashc]string {
 		hError:		"error",
@@ -488,6 +489,7 @@ func init() {
 	if debug {
 		fmt.Println("Init...")
 	}
+	petalq = make(chan *petalreq)
 	go petalsrv()
 	init_syms()
 	init_cmds()

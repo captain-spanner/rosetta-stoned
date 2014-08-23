@@ -37,7 +37,7 @@ func cmd_bool(name string, argc int, args []string, vp *bool, rose *Petal) ([]st
 		}
 	}
 	m = name + " " + m
-	if message && argc == 0 {
+	if rose.message && argc == 0 {
 		fmt.Println(m)
 	}
 	return strv(m), e
@@ -84,7 +84,7 @@ func cmd_echo(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 			e = e + " " + s
 		}
 	}
-	if message {
+	if rose.message {
 		fmt.Println(e)
 	}
 	return strv(e), 0
@@ -92,7 +92,7 @@ func cmd_echo(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 
 func cmd_get(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	v, m, e := fetch_get(args[0], args[1])
-	if message {
+	if rose.message {
 		if e != 0 || len(v) == 0 {
 			fmt.Printf("%s: %s: not found\n", args[1], args[0])
 		} else {
@@ -109,7 +109,7 @@ func cmd_getu(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 
 func cmd_help(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	m := "I need somebody!"
-	if message {
+	if rose.message {
 		fmt.Println(m)
 	}
 	return strv(m), 0
@@ -130,7 +130,7 @@ func cmd_index(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) 
 }
 
 func cmd_interactive(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
-	m, e := cmd_bool("interactive", argc, args, &interactive, rose)
+	m, e := cmd_bool("interactive", argc, args, &rose.interactive, rose)
 	return m, e
 }
 
@@ -139,7 +139,7 @@ func cmd_lookup(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int)
 }
 
 func cmd_message(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
-	m, e := cmd_bool("message", argc, args, &message, rose)
+	m, e := cmd_bool("rose.message", argc, args, &rose.message, rose)
 	return m, e
 }
 
@@ -148,7 +148,7 @@ func fetch_part(args []string, rose *Petal) (part, []string, int) {
 	if p != nil {
 		err := p.Error()
 		if err != "" {
-			if message {
+			if rose.message {
 				fmt.Printf("%s: %s\n", args[1], err)
 			}
 			return nil, strv(err), 1
@@ -160,11 +160,11 @@ func fetch_part(args []string, rose *Petal) (part, []string, int) {
 func cmd_part(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	p, m, e := fetch_part(args, rose)
 	if e != 0 || p == nil {
-		if message {
+		if rose.message {
 			fmt.Printf("%s: %s: not found\n", args[1], args[0])
 		}
 	} else {
-		if message {
+		if rose.message {
 			p.Print()
 		}
 	}
@@ -181,7 +181,7 @@ func cmd_pop(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	}
 	p, m, e := fetch_part(args, rose)
 	if e != 0 || p == nil {
-		if message {
+		if rose.message {
 			fmt.Printf("%s: %s: not found\n", args[1], args[0])
 		}
 		return m, e
@@ -201,7 +201,7 @@ func cmd_root(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	if m != "" {
 		fatal(root, 0, m)
 	}
-	if message {
+	if rose.message {
 		fmt.Printf("root = %q\n", root)
 	}
 	glob_set("root", root)
@@ -213,22 +213,22 @@ func cmd_run(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 	f, m := fileopen(n, false)
 	if m != "" {
 		d := fmt.Sprintf("%s: %s", n, m)
-		if message {
+		if rose.message {
 			fmt.Println(d)
 		}
 		return strv(d), 1
 	}
-	i := interactive
-	interactive = false
+	i := rose.interactive
+	rose.interactive = false
 	glob_flag("interactive", false)
 	run(f, rose)
-	interactive = i
+	rose.interactive = i
 	glob_flag("interactive", i)
 	return none, 0
 }
 
 func cmd_verbose(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
-	m, e := cmd_bool("verbose", argc, args, &verbose, rose)
+	m, e := cmd_bool("verbose", argc, args, &rose.verbose, rose)
 	return m, e
 }
 
@@ -238,6 +238,6 @@ func cmd_word(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 }
 
 func cmd_xeq(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
-	m, e := cmd_bool("xeq", argc, args, &xeq, rose)
+	m, e := cmd_bool("xeq", argc, args, &rose.xeq, rose)
 	return m, e
 }

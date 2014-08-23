@@ -13,7 +13,8 @@ var (
 	cheese string	= "Danablu"
 )
 
-func Shell(q bool, rose *Petal) string {
+func Shell(q bool) string {
+	rose := MkPetal("Shell", os.Stdin, nil, nil, Confp)
 	if !q {
 		run_cmd("echo " + Version, rose)
 		run_cmd("interactive on", rose)
@@ -26,8 +27,8 @@ func Shell(q bool, rose *Petal) string {
 func run(f *os.File, rose *Petal) string {
 	r := bufio.NewReaderSize(f, 8192)
 	for {
-		if interactive {
-			fmt.Printf("%s", prompt)
+		if rose.interactive {
+			fmt.Printf("%s", rose.prompt)
 		}
 		line, err := r.ReadString('\n')
 		// fix

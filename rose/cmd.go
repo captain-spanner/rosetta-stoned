@@ -116,7 +116,7 @@ func run_cmdx(argc int, args []string, cmdi cmdd, rose *Petal) (ret []string, er
 	if argc == 0 {
 		return
 	}
-	if xeq {
+	if rose.xeq {
 		cmd_echo(argc, args, cmdi, rose)
 	}
 	cmd := args[0]

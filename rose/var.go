@@ -23,8 +23,8 @@ func init_syms() {
 	glob_flag("debug", debug)
 	glob_flag("message", message)
 	glob_flag("verbose", verbose)
-	glob_flag("verbose", interactive)
-	glob_set("prompt", prompt)
+//	glob_flag("verbose", interactive)
+//	glob_set("prompt", prompt)
 }
 
 func var_getx(s string) ([]string, bool) {
