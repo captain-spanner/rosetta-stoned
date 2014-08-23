@@ -21,7 +21,11 @@ func Shell(q bool) string {
 		run_cmd("message on", rose)
 		run_cmd("echo " + cheese + " shell", rose)
 	}
-	return run(os.Stdin, rose)
+	ret := rose.XeqPetal()
+	if server {
+		<- fine
+	}
+	return ret
 }
 
 func run(f *os.File, rose *Petal) string {

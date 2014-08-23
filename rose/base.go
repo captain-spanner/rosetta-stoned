@@ -191,6 +191,7 @@ var (
 	base	*corpus
 	fine	chan bool = make(chan bool)
 
+	server bool		= false
 	debug bool		= false
 	message bool		= true
 	verbose bool		= true
