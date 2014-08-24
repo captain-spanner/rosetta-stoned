@@ -10,6 +10,7 @@ var (
 	indexv	[]*index = make([]*index , 0, 0)
 	indexr	map[string]string = make(map[string]string)
 	corpi	[]*corpus = make([]*corpus , 0, 0)
+	addixq	chan *index
 )
 
 const (
@@ -41,6 +42,19 @@ type index struct {
 	ok	bool
 }
 
+func addixsrv() {
+	for {
+		ix := <- addixq
+		s := ix.name
+		if indexm[s] != nil {
+			continue
+		}
+		indexm[s] = ix
+		indexv = append(indexv, ix)
+		indexr[s] = s
+	}
+}
+
 func (ix *index) print_index() string {
 	w := "-"
 	if ix.words != nil {
@@ -50,41 +64,41 @@ func (ix *index) print_index() string {
 		ix.count, hashes[ix.hash], ix.arg, ix.ok, w, ix.name)
 }
 
-func print_header() {
-	fmt.Printf("%8s%10s%5s%6s%7s  %s\n",
+func (rose *Petal) print_header() {
+	fmt.Fprintf(rose.wr, "%8s%10s%5s%6s%7s  %s\n",
 		"Count", "Encoding", "Arg", "Ready", "Words", "Name")
 }
 
-func print_indexes() []string {
+func (rose *Petal) print_indexes() []string {
 	if len(indexm) == 0 {
 		m := "No indexes"
 		if message {
-			fmt.Println(m)
+			fmt.Fprintln(rose.wr, m)
 		}
 		return none
 	}
 	if message {
-		print_header()
+		rose.print_header()
 	}
 	v := none
 	for _, x := range indexm {
 		m := x.print_index()
 		if message {
-			fmt.Println(m)
+			fmt.Fprintln(rose.wr, m)
 		}
 		v = append(v, m)
 	}
 	return v
 }
 
-func list_ixword(w string) {
+func (rose *Petal) list_ixword(w string) {
 	for _, x := range indexm {
 		m := x.words
 		if m == nil {
 			continue
 		}
 		if m[w] {
-			fmt.Println(x.name)
+			fmt.Fprintln(rose.wr, x.name)
 		}
 	}
 }
@@ -127,6 +141,9 @@ func read_words(p string) map[string]bool {
 }
 
 func make_index(s string) (int, string) {
+	if indexm[s] != nil {
+		return 0, ""
+	}
 	ix := new(index)
 	ix.ok = true
 	ix.name = s
@@ -171,9 +188,7 @@ func make_index(s string) (int, string) {
 		ix.cache = make_indexer(ix.count)
 	}
 	ix.words = read_words(p)
-	indexm[s] = ix
-	indexv = append(indexv, ix)
-	indexr[s] = s
+	addixq <- ix
 	return 0, ""
 }
 
@@ -210,19 +225,8 @@ func make_corpus(s string) (int, string) {
 			return e, m
 		}
 	}
-	isbase := false
 	e := 0
 	m := ""
-	if isbase {
-		if base != nil {
-			e = 1
-			m = s + ": base is set"
-			isbase = false
-		} else {
-			base = c
-			c.base = true
-		}
-	}
 	d := make([]*index, int(pMax), int(pMax))
 	for _, f := range l {
 		p := s + "/" + f
@@ -232,9 +236,11 @@ func make_corpus(s string) (int, string) {
 			d[c] = indexm[p]
 			pf := parts[c]
 			indexr[s + "." + pf] = p
+/*
 			if isbase {
 				indexr[pf] = p
 			}
+*/
 		}
 	}
 	c.parts = d

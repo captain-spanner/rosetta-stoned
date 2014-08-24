@@ -5,7 +5,7 @@ import (
 )
 
 type req struct {
-	cmd	func (int, []string, cmdd, *Petal) ([]string, int)
+	cmd	func (int, []string, *Petal) ([]string, int)
 	min	int
 	max	int
 	usage	string
@@ -14,8 +14,6 @@ type req struct {
 
 var (
 	none []string = make([]string, 0, 0)
-	cmdf *cmdb = &cmdb{ die: false }
-	cmdt *cmdb = &cmdb{ die: true }
 	cmdtab map[string]req
 )
 
@@ -25,42 +23,12 @@ type cmdd interface {
 	Die() bool
 }
 
-type cmdv struct {
-	src	string
-	index	int
-	die	bool
-}
-
-type cmdb struct {
-	die	bool
-}
-
-func (c *cmdv) Src() string {
-	return c.src
-}
-
-func (c *cmdv) Index() int {
-	return c.index
-}
-
-func (c *cmdv) Die() bool {
-	return c.die
-}
-
-func (c *cmdb) Src() string {
-	return ""
-}
-
-func (c *cmdb) Index() int {
-	return 0
-}
-
 func init_cmds() {
 	cmdtab = map[string]req {
 		"?":		{ cmd_help, 0, -1, "help", "help" },
 		"#":		{ cmd_comment, 0, -1, "# comment until end of line", "comment" },
 		"//":		{ cmd_comment, 0, -1, "// comment until end of line", "comment" },
-		"base":		{ cmd_base, 0, 1, "base <name>", "set base corpus" },		"collection":	{ cmd_collection, 0, 1, "collection [ <name> ]", "manage collections" },
+		"base":		{ cmd_base, 0, 1, "base <name>", "set base corpus" },		"collection":	{ cmd_collection, 1, 1, "collection [ <name> ]", "manage collections" },
 		"corpi":	{ cmd_corpi, 0, 0, "corpi", "list corpi" },
 		"corpus":	{ cmd_corpus, 1, 1, "corpus <name>", "add corpus" },
 		"debug":	{ cmd_debug, 0, 1, "debug [ <bool> ]", "manage debug" },
@@ -82,10 +50,6 @@ func init_cmds() {
 	}
 }
 
-func (c *cmdb) Die() bool {
-	return c.die
-}
-
 func Run_cmd(args []string, rose *Petal) ([]string, int) {
 	mesgs, errs := rose.run(args)
 	return mesgs, errs
@@ -97,14 +61,14 @@ func run_cmd(s string, rose *Petal) ([]string, int) {
 	return v, e
 }
 
-func run_cmdx(argc int, args []string, cmdi cmdd, rose *Petal) (ret []string, err int) {
+func run_cmdx(argc int, args []string, rose *Petal) (ret []string, err int) {
 	ret = none
 	err = 0
 	if argc == 0 {
 		return
 	}
 	if rose.xeq {
-		cmd_echo(argc, args, cmdi, rose)
+		cmd_echo(argc, args, rose)
 	}
 	cmd := args[0]
 	set := false
@@ -126,18 +90,14 @@ func run_cmdx(argc int, args []string, cmdi cmdd, rose *Petal) (ret []string, er
 	cmdf, found := cmdtab[cmd]
 	if !found {
 		mesg := cmd + ": unknown command"
-		if cmdi.Die() {
-			fatal(cmdi.Src(), cmdi.Index(), mesg)
-		} else {
-			fmt.Println(mesg)
-			err = 1
-			return
-		}
+		fmt.Println(mesg)
+		err = 1
+		return
 	}
 	if argc < cmdf.min || (cmdf.max >= 0 && argc > cmdf.max) {
 		fmt.Println("usage:", cmdf.usage)
 		err = 1
 		return
 	}
-	return cmdf.cmd(argc, args, cmdi, rose)
+	return cmdf.cmd(argc, args, rose)
 }

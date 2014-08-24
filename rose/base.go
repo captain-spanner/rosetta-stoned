@@ -490,10 +490,7 @@ func init() {
 	if debug {
 		fmt.Println("Init...")
 	}
-	petalq = make(chan *petalreq)
-	runq = make(chan *runreq)
-	go petalsrv()
-	go runsrv()
+	services()
 	init_syms()
 	init_cmds()
 	configure()

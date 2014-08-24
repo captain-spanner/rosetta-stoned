@@ -15,14 +15,6 @@ func fatal(src string, ix int, mesg string) {
 	panic(mesg)
 }
 
-func diagx(mesg string, src string, ix int, die bool) {
-	if die {
-		fatal(src, ix, mesg)
-	} else {
-		fmt.Println(mesg)
-	}
-}
-
 func bomb(src string, mesg string) {
 	fatal(src, 0, mesg)
 }

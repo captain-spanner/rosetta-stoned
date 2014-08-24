@@ -98,7 +98,7 @@ func runsrv() {
 }
 
 func runslave(req *runreq) {
-	mesgs, errs := run_cmdx(len(req.args), req.args, cmdf, req.rose)
+	mesgs, errs := run_cmdx(len(req.args), req.args, req.rose)
 	resp := new(runresp)
 	resp.mesgs = mesgs
 	resp.errs = errs

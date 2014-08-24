@@ -11,6 +11,9 @@ var (
 const (
 	limit	= 256
 	worthy	= 376
+
+	ixget	= iota
+	ixput
 )
 
 type indexer interface {
@@ -26,6 +29,14 @@ type icache struct {
 	cmap	map[string]*entry
 	queue	*indexpq
 	count	int
+	ixq	chan *ixreq
+}
+
+type ixreq struct {
+	cmd	int
+	key	string
+	value	[]byte
+	res	chan []byte
 }
 
 type entry struct {
@@ -69,10 +80,40 @@ func make_icache() *icache {
 	c.queue = &indexpq{}
 	heap.Init(c.queue)
 	c.count = 0
+	c.ixq = make(chan *ixreq)
+	go c.ixsrv()
 	return c
 }
 
 func (c *icache) get(s string) []byte {
+	req := new(ixreq)
+	req.cmd = ixget
+	req.key = s
+	req.res = make(chan []byte)
+	c.ixq <- req
+	return <- req.res
+}
+
+func (c *icache) put(s string, v []byte) {
+	req := new(ixreq)
+	req.cmd = ixput
+	req.key = s
+	req.value = v
+	c.ixq <- req
+}
+
+func (c *icache) ixsrv() {
+	for {
+		req := <- c.ixq
+		if req.cmd == ixget {
+			req.res <- c.getx(req.key)
+		} else {
+			c.putx(req.key, req.value)
+		}
+	}
+}
+
+func (c *icache) getx(s string) []byte {
 	r, ok := c.cmap[s]
 	if !ok {
 		return nil
@@ -81,7 +122,11 @@ func (c *icache) get(s string) []byte {
 	return r.value
 }
 
-func (c *icache) put(s string, v []byte) {
+func (c *icache) putx(s string, v []byte) {
+	_, ok := c.cmap[s]
+	if ok {
+		return
+	}
 	e := new(entry)
 	e.key = s
 	e.value = v
