@@ -218,12 +218,9 @@ func cmd_run(argc int, args []string, cmdi cmdd, rose *Petal) ([]string, int) {
 		}
 		return strv(d), 1
 	}
-	i := rose.interactive
-	rose.interactive = false
-	glob_flag("interactive", false)
-	run(f, rose)
-	rose.interactive = i
-	glob_flag("interactive", i)
+	p := MkPetal("File: " + n, f, nil, nil, rose)
+	p.interactive = false
+	p.XeqPetal()
 	return none, 0
 }
 

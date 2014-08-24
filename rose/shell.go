@@ -1,8 +1,6 @@
 package rose
 
 import (
-	"bufio"
-	"fmt"
 	"os"
 )
 
@@ -26,20 +24,4 @@ func Shell(q bool) string {
 		<- fine
 	}
 	return ret
-}
-
-func run(f *os.File, rose *Petal) string {
-	r := bufio.NewReaderSize(f, 8192)
-	for {
-		if rose.interactive {
-			fmt.Printf("%s", rose.prompt)
-		}
-		line, err := r.ReadString('\n')
-		// fix
-		if err != nil || (len(line) >=4 && line[0:4] == "quit") {
-			break
-		}
-		run_cmd(line, rose)
-	}
-	return "quit"
 }

@@ -87,21 +87,8 @@ func (c *cmdb) Die() bool {
 }
 
 func Run_cmd(args []string, rose *Petal) ([]string, int) {
-	return run_cmdx(len(args), args, cmdf, rose)
-}
-
-func Run_cmds(vect [][]string, src string, die bool, rose *Petal) (ret [][]string, errc int, errv []int) {
-	ret = make([][]string, 0)
-	errc = 0
-	errv = make([]int, 0)
-	for i, args := range vect {
-		cmd := &cmdv{ src: src, index: i + 1, die: die }
-		r, e := run_cmdx(len(args), args, cmd, rose)
-		ret = append(ret, r)
-		errc += e
-		errv = append(errv, e)
-	}
-	return
+	mesgs, errs := rose.run(args)
+	return mesgs, errs
 }
 
 func run_cmd(s string, rose *Petal) ([]string, int) {

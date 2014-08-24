@@ -23,8 +23,20 @@ type petalreq struct {
 	mesg	chan string
 }
 
+type runreq struct {
+	rose	*Petal
+	args	[]string
+	resp	chan *runresp
+}
+
+type runresp struct {
+	mesgs	[]string
+	errs	int
+}
+
 var (
 	petalq	chan *petalreq
+	runq	chan *runreq
 )
 
 func MkPetal(name string, rd io.Reader, wr io.Writer, ewr io.Writer, proto *Petal) *Petal {
@@ -76,4 +88,29 @@ func petalrun(req *petalreq) {
 		run_cmd(line, rose)
 	}
 	req.mesg <- ""
+}
+
+func runsrv() {
+	for {
+		req := <- runq
+		go runslave(req)
+	}
+}
+
+func runslave(req *runreq) {
+	mesgs, errs := run_cmdx(len(req.args), req.args, cmdf, req.rose)
+	resp := new(runresp)
+	resp.mesgs = mesgs
+	resp.errs = errs
+	req.resp <- resp
+}
+
+func (rose *Petal) run(args []string) ([]string, int) {
+	req := new(runreq)
+	req.rose = rose
+	req.args = args
+	req.resp = make(chan *runresp)
+	runq <- req
+	resp := <- req.resp
+	return resp.mesgs, resp.errs
 }

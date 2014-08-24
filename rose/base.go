@@ -491,7 +491,9 @@ func init() {
 		fmt.Println("Init...")
 	}
 	petalq = make(chan *petalreq)
+	runq = make(chan *runreq)
 	go petalsrv()
+	go runsrv()
 	init_syms()
 	init_cmds()
 	configure()
