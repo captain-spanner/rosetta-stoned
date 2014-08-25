@@ -6,6 +6,7 @@ import (
 )
 
 var (
+	pcacheq	chan *pcreq
 	pstamp	uint64
 	pmakers	[pMax]pmaker = [pMax]pmaker {
 		pDj:	make_pdata,
@@ -22,6 +23,11 @@ var (
 const (
 	plimit	= 1024 * 1024
 )
+
+type pcreq struct {
+	corpus	*corpus
+	resp	chan(*pcache)
+}
 
 type pmaker func(partc, []byte) part
 
@@ -363,9 +369,7 @@ func part_get(p string, s string) (part, string, int) {
 	if c == nil {
 		return nil, "base not set", 1
 	}
-	if c.pcaches == nil {
-		c.pcaches = make_pcache(c.parts)
-	}
+	make_pcache(c)
 	k := c.pcaches.caches[q]
 	if k == nil  {
 		return nil, "no part maker for " + p, 1
@@ -383,7 +387,29 @@ func part_get(p string, s string) (part, string, int) {
 	return r, "", 0
 }
 
-func make_pcache(parts []*index) *pcache {
+func pcachesrv() {
+	for {
+		req := <- pcacheq
+		if req.corpus.pcaches != nil {
+			req.resp <- req.corpus.pcaches
+		} else {
+			req.resp <- make_pcachex(req.corpus.parts)
+		}
+	}
+}
+
+func make_pcache(c *corpus) {
+	if c.pcaches == nil {
+		req := new(pcreq)
+		req.corpus = c
+		req.resp = make(chan *pcache)
+		pcacheq <- req
+		p := <- req.resp
+		c.pcaches = p
+	}
+}
+
+func make_pcachex(parts []*index) *pcache {
 	c := new(pcache)
 	c.caches = make([]*pcachev, pMax, pMax)
 	for p := pNone; p < pMax; p++ {
@@ -418,6 +444,9 @@ func (c *pcachev) get(s string) part {
 }
 
 func (c *pcachev) put(s string, p part) {
+	if c.cmap[s] != nil {
+		return
+	}
 	e := new(pentry)
 	e.key = s
 	e.epart = p
