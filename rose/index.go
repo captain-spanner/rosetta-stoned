@@ -10,7 +10,9 @@ var (
 	indexv	[]*index = make([]*index , 0, 0)
 	indexr	map[string]string = make(map[string]string)
 	corpi	[]*corpus = make([]*corpus , 0, 0)
+	corpn	map[string]*corpus = make(map[string]*corpus)
 	addixq	chan *index
+	addcorq	chan *corpus
 )
 
 const (
@@ -194,15 +196,28 @@ func make_index(s string) (int, string) {
 
 type corpus struct {
 	name	string
-	base	bool
+//	base	bool
 	parts	[]*index
 	pcaches	*pcache
 }
 
-func make_corpus(s string) (int, string) {
+func addcorsrv() {
+	for {
+		c := <- addcorq
+		if corpn[c.name] != nil {
+			continue
+		}
+		corpi = append(corpi, c)
+		corpn[c.name] = c
+	}
+}
+
+func (rose *Petal) make_corpus(s string) (int, string) {
+	if corpn[s] != nil {
+		return 0, ""
+	}
 	c := new(corpus)
 	c.name = s
-	c.base = false
 	p := root + "/" + s
 	v, err := ioutil.ReadDir(p)
 	if err != nil {
@@ -244,8 +259,17 @@ func make_corpus(s string) (int, string) {
 		}
 	}
 	c.parts = d
-	corpi = append(corpi, c)
+	addcorq	<- c
+	if rose.base == nil {
+		rose.base = c
+	}
 	return e, m
+}
+
+func (rose *Petal) print_corpi() {
+	for k, _ := range corpn {
+		fmt.Fprintln(rose.wr, k)
+	}
 }
 
 func make_collection(s string) (int, string) {

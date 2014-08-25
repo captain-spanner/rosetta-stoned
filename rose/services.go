@@ -1,10 +1,12 @@
 package rose
 
 func services() {
-	petalq = make(chan *petalreq)
 	addixq = make(chan *index)
+	addcorq = make(chan *corpus)
+	petalq = make(chan *petalreq)
 	runq = make(chan *runreq)
-	go petalsrv()
 	go addixsrv()
+	go addcorsrv()
+	go petalsrv()
 	go runsrv()
 }

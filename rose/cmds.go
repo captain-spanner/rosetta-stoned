@@ -53,11 +53,12 @@ func cmd_collection(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func cmd_corpi(argc int, args []string, rose *Petal) ([]string, int) {
+	rose.print_corpi()
 	return none, 0
 }
 
 func cmd_corpus(argc int, args []string, rose *Petal) ([]string, int) {
-	e, m  := make_corpus(args[0])
+	e, m  := rose.make_corpus(args[0])
 	if m != "" {
 		return strv(m), e
 	} else {

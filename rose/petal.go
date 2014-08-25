@@ -11,6 +11,7 @@ type Petal struct {
 	rd		io.Reader
 	wr		io.Writer
 	ewr		io.Writer
+	base		*corpus
 	message		bool
 	verbose		bool
 	xeq		bool
