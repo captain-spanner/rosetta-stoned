@@ -11,6 +11,15 @@ func cmd_comment(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func cmd_base(argc int, args []string, rose *Petal) ([]string, int) {
+	if argc == 0 {
+		if rose.base == nil {
+			fmt.Fprintln(rose.wr, "Base not set")
+		} else {
+			fmt.Fprintln(rose.wr, rose.base.name)
+		}
+	} else {
+		rose.set_base(args[0])
+	}
 	return none, 0
 }
 
@@ -216,6 +225,9 @@ func cmd_run(argc int, args []string, rose *Petal) ([]string, int) {
 	p := MkPetal("File: " + n, f, nil, nil, rose)
 	p.interactive = false
 	p.XeqPetal()
+	if p.base != rose.base {
+		rose.base = p.base
+	}
 	return none, 0
 }
 

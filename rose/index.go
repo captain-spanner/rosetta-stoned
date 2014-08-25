@@ -212,6 +212,15 @@ func addcorsrv() {
 	}
 }
 
+func (rose *Petal) set_base(s string) {
+	c := corpn[s]
+	if c == nil {
+		fmt.Fprintf(rose.wr, "%s: corpus not loaded\n", s)
+	} else {
+		rose.base = c
+	}
+}
+
 func (rose *Petal) make_corpus(s string) (int, string) {
 	if corpn[s] != nil {
 		return 0, ""
