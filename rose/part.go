@@ -22,11 +22,21 @@ var (
 
 const (
 	plimit	= 1024 * 1024
+
+	pcget	= iota
+	pcput
 )
 
 type pcreq struct {
 	corpus	*corpus
 	resp	chan(*pcache)
+}
+
+type pkreq struct {
+	cmd	int
+	key	string
+	value	part
+	resp	chan(part)
 }
 
 type pmaker func(partc, []byte) part
@@ -35,6 +45,7 @@ type pcachev struct {
 	cmap	map[string]*pentry
 	queue	*pindexpq
 	count	int
+	pkq	chan *pkreq
 }
 
 type pcache struct {
@@ -421,6 +432,8 @@ func make_pcachex(parts []*index) *pcache {
 		v.queue = &pindexpq{}
 		heap.Init(v.queue)
 		v.count = 0
+		v.pkq = make(chan *pkreq)
+		go v.pcsrv()
 		c.caches[p] = v
 	}
 	return c
@@ -434,7 +447,35 @@ func (c *pcache) put(s string, p partc, v part) {
 	c.caches[p].put(s, v)
 }
 
+func (c *pcachev) pcsrv() {
+	for {
+		req := <- c.pkq
+		if req.cmd == pcget {
+			req.resp <- c.getx(req.key)
+		} else {
+			c.putx(req.key, req.value)
+		}
+	}
+}
+
 func (c *pcachev) get(s string) part {
+	req := new(pkreq)
+	req.cmd = pcget
+	req.key = s
+	req.resp = make(chan part)
+	c.pkq <- req
+	return <- req.resp
+}
+
+func (c *pcachev) put(s string, p part) {
+	req := new(pkreq)
+	req.cmd = pcget
+	req.key = s
+	req.value = p
+	c.pkq <- req
+}
+
+func (c *pcachev) getx(s string) part {
 	r, ok := c.cmap[s]
 	if !ok {
 		return nil
@@ -443,7 +484,7 @@ func (c *pcachev) get(s string) part {
 	return r.epart
 }
 
-func (c *pcachev) put(s string, p part) {
+func (c *pcachev) putx(s string, p part) {
 	if c.cmap[s] != nil {
 		return
 	}
