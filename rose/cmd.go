@@ -90,12 +90,12 @@ func run_cmdx(argc int, args []string, rose *Petal) (ret []string, err int) {
 	cmdf, found := cmdtab[cmd]
 	if !found {
 		mesg := cmd + ": unknown command"
-		fmt.Println(mesg)
+		fmt.Fprintln(rose.wr, mesg)
 		err = 1
 		return
 	}
 	if argc < cmdf.min || (cmdf.max >= 0 && argc > cmdf.max) {
-		fmt.Println("usage:", cmdf.usage)
+		fmt.Fprintln(rose.wr, "usage:", cmdf.usage)
 		err = 1
 		return
 	}

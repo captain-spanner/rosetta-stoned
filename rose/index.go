@@ -24,7 +24,7 @@ type part interface {
 	Describe() string
 	Error() string
 	Populate(int) ([]string, int)
-	Print()
+	Print(*Petal)
 }
 
 type index struct {
@@ -142,7 +142,7 @@ func read_words(p string) map[string]bool {
 	return m
 }
 
-func make_index(s string) (int, string) {
+func make_index(s string, rose *Petal) (int, string) {
 	if indexm[s] != nil {
 		return 0, ""
 	}
@@ -153,7 +153,7 @@ func make_index(s string) (int, string) {
 	m := checkdir(p)
 	if m != "" {
 		if message {
-			fmt.Printf("%s: %s\n", s, m)
+			fmt.Fprintf(rose.wr, "%s: %s\n", s, m)
 		}
 		return 1, m
 	}
@@ -241,7 +241,7 @@ func (rose *Petal) make_corpus(s string) (int, string) {
 			continue
 		}
 		p := s + "/" + f
-		e, m := make_index(p)
+		e, m := make_index(p, rose)
 		if message && m != "" {
 			fmt.Printf("%s: %s\n", p, m)
 		}
@@ -281,7 +281,7 @@ func (rose *Petal) print_corpi() {
 	}
 }
 
-func make_collection(s string) (int, string) {
+func make_collection(s string, rose *Petal) (int, string) {
 	p := root + "/" + s
 	v, err := ioutil.ReadDir(p)
 	if err != nil {
@@ -293,7 +293,7 @@ func make_collection(s string) (int, string) {
 	}
 	for _, f := range l {
 		p := s + "/" + f
-		e, m := make_index(p)
+		e, m := make_index(p, rose)
 		if m != "" {
 			return e, m
 		}

@@ -19,7 +19,7 @@ func fetch_file(p string, s string) []byte {
 	return b
 }
 
-func fetch_info(x string, s string) (*index, uint32, string) {
+func fetch_info(x string, s string, rose *Petal) (*index, uint32, string) {
 	var ix *index
 	r, f := indexr[x]
 	if f {
@@ -28,7 +28,7 @@ func fetch_info(x string, s string) (*index, uint32, string) {
 	if !f {
 		m := x + ": not an index"
 		if verbose {
-			fmt.Println(m)
+			fmt.Fprintln(rose.wr, m)
 		}
 		return nil, 0, m
 	}
@@ -36,8 +36,8 @@ func fetch_info(x string, s string) (*index, uint32, string) {
 	return ix, h, ""
 }
 
-func fetch_get(x string, s string) ([]byte, []string, int) {
-	ix, h, m := fetch_info(x, s)
+func fetch_get(x string, s string, rose *Petal) ([]byte, []string, int) {
+	ix, h, m := fetch_info(x, s, rose)
 	if m != "" {
 		return nil, strv(m), 1
 	}
@@ -50,8 +50,8 @@ func fetch_getx(ix *index, s string) []byte {
 	return ix.get(s, h)
 }
 
-func fetch_raw(x string, s string) ([]byte, []string, int) {
-	ix, h, m := fetch_info(x, s)
+func fetch_raw(x string, s string, rose *Petal) ([]byte, []string, int) {
+	ix, h, m := fetch_info(x, s, rose)
 	if m != "" {
 		return nil, strv(m), 1
 	}

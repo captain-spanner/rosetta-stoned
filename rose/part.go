@@ -168,18 +168,18 @@ func (p *pdata) Populate(r int) ([]string, int) {
 	return mesgs, errs
 }
 
-func (p *pdata) Print() {
-	fmt.Printf("lex %d\n", p.lex)
-	fmt.Printf("pos %s\n", poss[p.pos])
-	fmt.Printf("words %d\n", len(p.words))
+func (p *pdata) Print(rose *Petal) {
+	fmt.Fprintf(rose.wr, "lex %d\n", p.lex)
+	fmt.Fprintf(rose.wr, "pos %s\n", poss[p.pos])
+	fmt.Fprintf(rose.wr, "words %d\n", len(p.words))
 	for _, w := range p.words {
-		fmt.Printf("\t%q\n", w)
+		fmt.Fprintf(rose.wr, "\t%q\n", w)
 	}
 	for _, d := range p.ptrs {
-		fmt.Printf("\t{ %s }\n", dptr_str(d))
+		fmt.Fprintf(rose.wr, "\t{ %s }\n", dptr_str(d))
 	}
 	if p.ptrp != nil {
-		fmt.Println("Populated")
+		fmt.Fprintln(rose.wr, "Populated")
 	}
 }
 
@@ -316,12 +316,12 @@ func (p *pindex) Populate(r int) ([]string, int) {
 	return mesgs, errs
 }
 
-func (p *pindex) Print() {
-	fmt.Printf("pos %s\n", poss[p.pos])
-	fmt.Printf("rels:\n\t{%s }\n", psds_str(p.pvect))
-	fmt.Printf("senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
+func (p *pindex) Print(rose *Petal) {
+	fmt.Fprintf(rose.wr, "pos %s\n", poss[p.pos])
+	fmt.Fprintf(rose.wr, "rels:\n\t{%s }\n", psds_str(p.pvect))
+	fmt.Fprintf(rose.wr, "senses:\n\t{%s }\n", uints_strz(p.senses, p.sensez))
 	if p.sensep != nil {
-		fmt.Println("Populated")
+		fmt.Fprintln(rose.wr, "Populated")
 	}
 }
 
