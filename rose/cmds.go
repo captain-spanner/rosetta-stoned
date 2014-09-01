@@ -149,7 +149,7 @@ func cmd_message(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func fetch_part(args []string, rose *Petal) (part, []string, int) {
-	p, m, e := part_get(args[0], args[1])
+	p, m, e := part_get(args[0], args[1], rose)
 	if p != nil {
 		err := p.Error()
 		if err != "" {
@@ -191,7 +191,7 @@ func cmd_pop(argc int, args []string, rose *Petal) ([]string, int) {
 		}
 		return m, e
 	}
-	v, e := p.Populate(r)
+	v, e := p.Populate(r, rose)
 	return v, e
 }
 

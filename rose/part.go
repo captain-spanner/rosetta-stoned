@@ -39,7 +39,7 @@ type pkreq struct {
 	resp	chan(part)
 }
 
-type pmaker func(partc, []byte) part
+type pmaker func(partc, []byte, *Petal) part
 
 type pcachev struct {
 	cmap	map[string]*pentry
@@ -88,17 +88,17 @@ type pdata struct {
 	extra	[]string
 }
 
-func make_dptr(v []string, m map[string]psd) *dptr {
+func make_dptr(v []string, m map[string]psd, rose *Petal) *dptr {
 	d := new(dptr)
 	t := m[v[0]]
 	if t == dNone && verbose {
-		fmt.Printf("unknown psd: %#q\n", v[0]) 
+		fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[0]) 
 	}
 	d.tag = t
 	s := v[2][0]
 	ps, f := posm[s]
 	if !f {
-		fmt.Printf("bad pos '%c'", s)
+		fmt.Fprintf(rose.wr, "bad pos '%c'", s)
 		return nil
 	}
 	d.pos = ps
@@ -107,11 +107,11 @@ func make_dptr(v []string, m map[string]psd) *dptr {
 	return d
 }
 
-func (d *dptr) pop_dptr(r int, z int) (part, string, int) {
+func (d *dptr) pop_dptr(r int, z int, rose *Petal) (part, string, int) {
 	dpart := posdx[d.pos]
-	v, m, e := part_get(dpart, uint_strz(d.index, z))
+	v, m, e := part_get(dpart, uint_strz(d.index, z), rose)
 	if v != nil {
-		v.Populate(r)
+		v.Populate(r, rose)
 	}
 	return v, m, e
 }
@@ -136,7 +136,7 @@ func (p *pdata) Error() string {
 	return p.error
 }
 
-func (p *pdata) Populate(r int) ([]string, int) {
+func (p *pdata) Populate(r int, rose *Petal) ([]string, int) {
 	if r <= p.rec {
 		return none, 0
 	}
@@ -150,7 +150,7 @@ func (p *pdata) Populate(r int) ([]string, int) {
 		p.ptrp = v
 		oz := int(p.ptroz)
 		for i, d := range p.ptrs {
-			t, m, e := d.pop_dptr(r, oz)
+			t, m, e := d.pop_dptr(r, oz, rose)
 			if e != 0 {
 				errs++
 				mesgs = append(mesgs, m)
@@ -161,7 +161,7 @@ func (p *pdata) Populate(r int) ([]string, int) {
 	} else {
 		for _, t := range p.ptrp {
 			if t != nil {
-				t.Populate(r)
+				t.Populate(r, rose)
 			}
 		}
 	}
@@ -183,7 +183,7 @@ func (p *pdata) Print(rose *Petal) {
 	}
 }
 
-func make_pdata(c partc, b []byte) part {
+func make_pdata(c partc, b []byte, rose *Petal) part {
 	p := new(pdata)
 	p.value = b
 	v := smash_cmd(string(b))
@@ -224,7 +224,7 @@ func make_pdata(c partc, b []byte) part {
 		if i == 0 {
 			p.ptroz = byte(len(v[x+1]))
 		}
-		ptrs[i] = make_dptr(v[x:x+4], psm)
+		ptrs[i] = make_dptr(v[x:x+4], psm, rose)
 		x += 4
 	}
 	p.ptrs = ptrs
@@ -281,7 +281,7 @@ func (p *pindex) Error() string {
 	return p.error
 }
 
-func (p *pindex) Populate(r int) ([]string, int) {
+func (p *pindex) Populate(r int, rose *Petal) ([]string, int) {
 	if r == 0 {
 		return none, 0
 	}
@@ -293,22 +293,22 @@ func (p *pindex) Populate(r int) ([]string, int) {
 		v := make([]part, z, z)
 		p.sensep = v
 		for i, s := range p.senses {
-			t, m, e := part_get(dpart, uint_strz(s, p.sensez))
+			t, m, e := part_get(dpart, uint_strz(s, p.sensez), rose)
 			if e != 0 {
 				errs++
 				mesgs = append(mesgs, m)
 			} else {
 				v[i] = t
-				t.Populate(r)
+				t.Populate(r, rose)
 			}
 		}
 		if errs != 0 && message {
-			fmt.Printf("errors: %d\n", errs)
+			fmt.Fprintf(rose.wr, "errors: %d\n", errs)
 		}
 	} else {
 		for _, t := range p.sensep {
 			if t != nil {
-				t.Populate(r)
+				t.Populate(r, rose)
 			}
 		}
 			
@@ -325,7 +325,7 @@ func (p *pindex) Print(rose *Petal) {
 	}
 }
 
-func make_pindex(c partc, b []byte) part {
+func make_pindex(c partc, b []byte, rose *Petal) part {
 	p := new(pindex)
 	p.value = b
 	v := smash_cmd(string(b))
@@ -353,7 +353,7 @@ func make_pindex(c partc, b []byte) part {
 	for i := 0; i < pz; i++ {
 		t := m[v[3+i]]
 		if t == dNone && verbose {
-			fmt.Printf("unknown psd: %#q\n", v[3+i]) 
+			fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[3+i]) 
 		}
 		pv[i] = t
 	}
@@ -370,13 +370,12 @@ func make_pindex(c partc, b []byte) part {
 	return p
 }
 
-// should allow other corpi than base
-func part_get(p string, s string) (part, string, int) {
+func part_get(p string, s string, rose *Petal) (part, string, int) {
 	q, f := partt[p]
 	if !f {
 		return nil, p + " is not a part", 1
 	}
-	c := base
+	c := rose.base
 	if c == nil {
 		return nil, "base not set", 1
 	}
@@ -393,7 +392,7 @@ func part_get(p string, s string) (part, string, int) {
 	if b == nil  {
 		return nil, s + ": not found", 1
 	}
-	r = pmakers[q](q, b)
+	r = pmakers[q](q, b, rose)
 	k.put(s, r)
 	return r, "", 0
 }

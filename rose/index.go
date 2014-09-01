@@ -23,7 +23,7 @@ type part interface {
 	Content() []byte
 	Describe() string
 	Error() string
-	Populate(int) ([]string, int)
+	Populate(int, *Petal) ([]string, int)
 	Print(*Petal)
 }
 
@@ -196,7 +196,6 @@ func make_index(s string, rose *Petal) (int, string) {
 
 type corpus struct {
 	name	string
-//	base	bool
 	parts	[]*index
 	pcaches	*pcache
 }
@@ -243,7 +242,7 @@ func (rose *Petal) make_corpus(s string) (int, string) {
 		p := s + "/" + f
 		e, m := make_index(p, rose)
 		if message && m != "" {
-			fmt.Printf("%s: %s\n", p, m)
+			fmt.Fprintf(rose.wr, "%s: %s\n", p, m)
 		}
 		if m != "" {
 			return e, m
@@ -302,25 +301,12 @@ func make_collection(s string, rose *Petal) (int, string) {
 }
 
 func (ix *index) get(s string, h uint32) []byte {
-	if verbose {
-		fmt.Printf("ix.get(%q)\n", s)
-	}
 	b := ix.cache.get(s)
 	if b != nil {
 		return b
 	}
-	if verbose {
-		fmt.Println("not in cache")
-	}
 	if !checkmap(ix.imap, h) {
-		if verbose {
-			fmt.Println("not in map")
-		}
 		return nil
-	} else {
-		if verbose {
-			fmt.Println("in map")
-		}
 	}
 	b = fetch_string(ix, s, h)
 	if b == nil {

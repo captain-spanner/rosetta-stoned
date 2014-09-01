@@ -79,7 +79,7 @@ func petalrun(req *petalreq) {
 	r := bufio.NewReaderSize(rose.rd, 8192)
 	for {
 		if rose.interactive {
-			fmt.Printf("%s", rose.prompt)
+			fmt.Fprintf(rose.wr, "%s", rose.prompt)
 		}
 		line, err := r.ReadString('\n')
 		// fix

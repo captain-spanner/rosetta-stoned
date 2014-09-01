@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"os"
 )
 
 var (
@@ -11,7 +12,7 @@ var (
 )
 
 func fatal(src string, ix int, mesg string) {
-	fmt.Printf("rose: %s\n", mesg)
+	fmt.Fprintf(os.Stderr, "rose: %s\n", mesg)
 	panic(mesg)
 }
 
