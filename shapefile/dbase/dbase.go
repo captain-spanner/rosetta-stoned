@@ -1,44 +1,68 @@
 package shapefile
 
 import (
+	"fmt"
 	"io"
 	"os"
+)
+
+const (
+	hdrsize = 68
 )
 
 type Dbase struct {
 	path	string
 	size	int
 	body	[]byte
+	err	string
 }
 
-func MakeDbase(n string) (*Dbase, string) {
+func MakeDbase(n string, out io.Writer) (*Dbase, error) {
 	f, err := os.Open(n)
 	if err != nil {
-		return nil, "open failed"
+		return nil, err
 	}
 	defer f.Close()
 	fi, err := f.Stat()
+	d := new(Dbase)
+	d.path = n
 	if err != nil {
-		return nil, "stat failed"
+		return nil, err
 	}
 	m := fi.Mode()
 	if !m.IsRegular() {
-		return nil, "not a file"
+		d.err = "not a file"
+		return nil, d
 	}
-	d := new(Dbase)
-	d.path = n
 	d.size = int(fi.Size())
 	d.body = make([]byte, d.size, d.size)
 	z, err := io.ReadFull(f, d.body)
 	if err != nil {
-		return nil, "read error"
+		return nil, err
 	}
 	if z != d.size {
-		return nil, "short read"
+		d.err = fmt.Sprintf("read mismatch: size %d, %d read", d.size, z)
+		return nil, d
 	}
-	return d, d.decode()
+	return d, d.decode(out)
 }
 
-func (d *Dbase) decode() string {
-	return ""
+func (d *Dbase) Error() string {
+	return d.err
+}
+
+func (d *Dbase) lencheck(n int, s string) error {
+	if n > d.size {
+		d.err = fmt.Sprintf("need %d for %s, have %d", n, s, d.size)
+		return d
+	}
+	return nil
+}
+
+func (d *Dbase) decode(out io.Writer) error {
+	err := d.lencheck(hdrsize, "header")
+	if err != nil {
+		return err
+	}
+	return nil
 }
