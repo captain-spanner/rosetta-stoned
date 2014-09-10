@@ -9,6 +9,7 @@ import (
 const (
 	hdrsize = 68
 	fdescsz	= 48
+	fdterm	= 0x0D
 )
 
 type Dbase struct {
@@ -19,8 +20,7 @@ type Dbase struct {
 	nrecs	int
 	hdrsize	int
 	recsize	int
-	nfdescs	int
-	fdraw	[][]byte
+	fpoff	int
 	err	string
 }
 
@@ -84,26 +84,29 @@ func (d *Dbase) decode(out io.Writer) error {
 		fmt.Fprintf(out, "hdrsize\t%d\n", d.hdrsize)
 		fmt.Fprintf(out, "recsize\t%d\n", d.recsize)
 	}
-	err = d.lencheck(hdrsize + d.hdrsize, "field desc")
+	err = d.lencheck(hdrsize + d.hdrsize, "header ext")
 	if err != nil {
 		return err
 	}
-	n := d.hdrsize
-	if n % fdescsz != 1 {
-		d.err = fmt.Sprintf("hdrsize %d not %d * n + 1", n, fdescsz)
-		return d
-	}
-	n = (n - 1) / fdescsz
-	d.nfdescs = n
-	if out != nil {
-		fmt.Fprintf(out, "nfdescs\t%d\n", n)
-	}
-	v := make([][]byte, n, n)
-	d.fdraw = v
 	o := hdrsize
-	for i := 0; i < n; i++ {
-		v[i] = body[o : o + fdescsz]
-		o += fdescsz
+	for ; body[o] != fdterm; o++ {}
+	o++
+	d.fpoff = o
+	if out != nil {
+		fmt.Fprintf(out, "fpoff\t%d\n", d.fpoff)
+		fmt.Fprintf(out, "remains\t%d\n", d.size - d.fpoff)
+	}
+	err = d.lencheck(d.fpoff + d.nrecs * d.recsize + 1, "data")
+	if err != nil {
+		return err
 	}
 	return nil
+}
+
+func (d *Dbase) getrec(n int) []byte {
+	if n < 0 || n >= d.nrecs {
+		return nil
+	}
+	o := d.fpoff + n * d.recsize
+	return d.body[o : o + d.recsize]
 }
