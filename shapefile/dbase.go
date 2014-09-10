@@ -3,7 +3,6 @@ package shapefile
 import (
 	"fmt"
 	"io"
-	"os"
 )
 
 const (
@@ -25,32 +24,14 @@ type Dbase struct {
 }
 
 func MakeDbase(n string, out io.Writer) (*Dbase, error) {
-	f, err := os.Open(n)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
 	d := new(Dbase)
 	d.path = n
-	m := fi.Mode()
-	if !m.IsRegular() {
-		d.err = "not a file"
-		return nil, d
-	}
-	d.size = int(fi.Size())
-	d.body = make([]byte, d.size, d.size)
-	z, err := io.ReadFull(f, d.body)
+	body, err := ReadFile(n)
 	if err != nil {
 		return nil, err
 	}
-	if z != d.size {
-		d.err = fmt.Sprintf("read mismatch: size %d, %d read", d.size, z)
-		return nil, d
-	}
+	d.body = body
+	d.size = len(body)
 	return d, d.decode(out)
 }
 
@@ -59,11 +40,7 @@ func (d *Dbase) Error() string {
 }
 
 func (d *Dbase) lencheck(n int, s string) error {
-	if n > d.size {
-		d.err = fmt.Sprintf("need %d for %s, have %d", n, s, d.size)
-		return d
-	}
-	return nil
+	return lencheck(n, d.size, s)
 }
 
 func (d *Dbase) decode(out io.Writer) error {
@@ -96,21 +73,27 @@ func (d *Dbase) decode(out io.Writer) error {
 	if out != nil {
 		fmt.Fprintf(out, "fpoff\t%d\n", d.fpoff)
 		fmt.Fprintf(out, "remains\t%d\n", d.size-d.fpoff)
+		fmt.Fprintf(out, "need\t%d\n", d.nrecs*d.recsize+1)
 	}
-	err = d.lencheck(d.fpoff+d.nrecs*d.recsize+1, "data")
+	o = d.fpoff+d.nrecs*d.recsize
+	err = d.lencheck(o+1, "data")
 	if err != nil {
 		return err
 	}
 	if out != nil {
-		fmt.Fprintf(out, "EOD\t0x%02X\n", body[d.fpoff+d.nrecs*d.recsize])
+		fmt.Fprintf(out, "EOD\t%s\n", sbyte(body[o]))
 	}
 	return nil
 }
 
-func (d *Dbase) getrec(n int) []byte {
+func (d *Dbase) Getrec(n int) []byte {
 	if n < 0 || n >= d.nrecs {
 		return nil
 	}
 	o := d.fpoff + n*d.recsize
 	return d.body[o : o+d.recsize]
+}
+
+func (d *Dbase) Nrecs() int {
+	return d.nrecs
 }

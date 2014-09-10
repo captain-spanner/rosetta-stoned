@@ -1,6 +1,8 @@
 package shapefile
 
-import ()
+import (
+	"fmt"
+)
 
 func dbstr(b []byte) string {
 	n := len(b)
@@ -12,4 +14,12 @@ func dbstr(b []byte) string {
 		}
 	}
 	return string(b[:l+1])
+}
+
+func sbyte(b byte) string {
+	if b > 0 && b <= 27 {
+		return fmt.Sprintf("^%c", b+'A'-1)
+	} else {
+		return fmt.Sprintf("0x%02X", b)
+	}
 }
