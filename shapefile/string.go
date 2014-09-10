@@ -1,7 +1,6 @@
 package shapefile
 
-import (
-)
+import ()
 
 func dbstr(b []byte) string {
 	n := len(b)

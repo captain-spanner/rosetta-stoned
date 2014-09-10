@@ -8,20 +8,20 @@ import (
 
 const (
 	hdrsize = 68
-	fdescsz	= 48
-	fdterm	= 0x0D
+	fdescsz = 48
+	fdterm  = 0x0D
 )
 
 type Dbase struct {
-	path	string
-	size	int
-	body	[]byte
-	tag	byte
-	nrecs	int
-	hdrsize	int
-	recsize	int
-	fpoff	int
-	err	string
+	path    string
+	size    int
+	body    []byte
+	tag     byte
+	nrecs   int
+	hdrsize int
+	recsize int
+	fpoff   int
+	err     string
 }
 
 func MakeDbase(n string, out io.Writer) (*Dbase, error) {
@@ -84,21 +84,25 @@ func (d *Dbase) decode(out io.Writer) error {
 		fmt.Fprintf(out, "hdrsize\t%d\n", d.hdrsize)
 		fmt.Fprintf(out, "recsize\t%d\n", d.recsize)
 	}
-	err = d.lencheck(hdrsize + d.hdrsize, "header ext")
+	err = d.lencheck(hdrsize+d.hdrsize, "header ext")
 	if err != nil {
 		return err
 	}
 	o := hdrsize
-	for ; body[o] != fdterm; o++ {}
+	for ; body[o] != fdterm; o++ {
+	}
 	o++
 	d.fpoff = o
 	if out != nil {
 		fmt.Fprintf(out, "fpoff\t%d\n", d.fpoff)
-		fmt.Fprintf(out, "remains\t%d\n", d.size - d.fpoff)
+		fmt.Fprintf(out, "remains\t%d\n", d.size-d.fpoff)
 	}
-	err = d.lencheck(d.fpoff + d.nrecs * d.recsize + 1, "data")
+	err = d.lencheck(d.fpoff+d.nrecs*d.recsize+1, "data")
 	if err != nil {
 		return err
+	}
+	if out != nil {
+		fmt.Fprintf(out, "EOD\t0x%02X\n", body[d.fpoff+d.nrecs*d.recsize])
 	}
 	return nil
 }
@@ -107,6 +111,6 @@ func (d *Dbase) getrec(n int) []byte {
 	if n < 0 || n >= d.nrecs {
 		return nil
 	}
-	o := d.fpoff + n * d.recsize
-	return d.body[o : o + d.recsize]
+	o := d.fpoff + n*d.recsize
+	return d.body[o : o+d.recsize]
 }
