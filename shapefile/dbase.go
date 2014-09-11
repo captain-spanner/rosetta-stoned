@@ -36,7 +36,7 @@ func MakeDbase(n string, out io.Writer) (*Dbase, error) {
 }
 
 func (d *Dbase) Error() string {
-	return d.err
+	return "dbase: "+d.err
 }
 
 func (d *Dbase) lencheck(n int, s string) error {
@@ -54,6 +54,7 @@ func (d *Dbase) decode(out io.Writer) error {
 	d.hdrsize = int(sb16(body[8:]))
 	d.recsize = int(sb16(body[10:]))
 	if out != nil {
+		fmt.Fprintln(out, "dbase:")
 		fmt.Fprintf(out, "path\t%q\n", d.path)
 		fmt.Fprintf(out, "size\t%d\n", d.size)
 		fmt.Fprintf(out, "tag\t0x%02X\n", d.tag)
