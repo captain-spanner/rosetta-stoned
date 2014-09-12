@@ -5,6 +5,21 @@ import (
 	"io"
 )
 
+type polygons struct {
+	count	int
+	polys	[]polygon
+}
+
+type polygon struct {
+	count	int
+	points	[]point
+}
+
+type point struct {
+	x	float64
+	y	float64
+}
+
 func (s *Shapefile) decode(out io.Writer) error {
 	xmin := 1 << 30
 	xmax := -1

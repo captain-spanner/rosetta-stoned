@@ -9,6 +9,7 @@ type Shapefile struct {
 	shp	*Shapes
 	shx	*Index
 	dbase	*Dbase
+	polys	[]polygons
 }
 
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
