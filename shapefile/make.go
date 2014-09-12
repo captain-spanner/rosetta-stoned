@@ -7,6 +7,7 @@ import (
 type Shapefile struct {
 	path	string
 	shp	*Shp
+	shx	*Index
 	dbase	*Dbase
 }
 
@@ -18,6 +19,11 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		return nil, err
 	}
 	sf.shp = s
+	x, err := MakeIndex(n+".shx", out)
+	if err != nil {
+		return nil, err
+	}
+	sf.shx = x
 	d, err := MakeDbase(n+".dbf", out)
 	if err != nil {
 		return nil, err
