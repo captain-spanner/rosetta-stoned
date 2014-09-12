@@ -1,6 +1,12 @@
 package shapefile
 
 import (
+	"fmt"
+	"io"
+)
+
+const (
+	Hdrsize = 100
 )
 
 type Header struct {
@@ -19,7 +25,7 @@ type bbox struct {
 	ymax	float64
 }
 
-func MakeHeader(b []byte) *Header {
+func MakeHeader(b []byte, out io.Writer) *Header {
 	h := new(Header)
 	h.fid = int(sb32(b[0:]))
 	h.size = int(sb32(b[24:]))
@@ -27,6 +33,13 @@ func MakeHeader(b []byte) *Header {
 	h.shape = int(sb32(b[32:]))
 	makebbox(b[36:], &h.xybox)
 	makebbox(b[68:], &h.zmbox)
+	if out != nil {
+		fmt.Fprintln(out, "header:")
+		fmt.Fprintf(out, "fid\t%d\n", h.fid)
+		fmt.Fprintf(out, "size\t%d\n", h.size)
+		fmt.Fprintf(out, "version\t%d\n", h.version)
+		fmt.Fprintf(out, "shape\t%d\n", h.shape)
+	}
 	return h
 }
 
