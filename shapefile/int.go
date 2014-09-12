@@ -27,9 +27,9 @@ func ub32(b []byte) uint32 {
 }
 
 func sb16(b []byte) int16 {
-	return int16(ul16(b))
+	return int16(ub16(b))
 }
 
 func sb32(b []byte) int32 {
-	return int32(ul32(b))
+	return int32(ub32(b))
 }

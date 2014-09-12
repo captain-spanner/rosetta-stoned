@@ -29,5 +29,6 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		return nil, err
 	}
 	sf.dbase = d
+	sf.decode(out)
 	return sf, nil
 }
