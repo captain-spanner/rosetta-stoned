@@ -30,7 +30,6 @@ func MakeHeader(b []byte, out io.Writer) *Header {
 	makebbox(b[36:], &h.xybox)
 	makebbox(b[68:], &h.zmbox)
 	if out != nil {
-		fmt.Fprintln(out, "header:")
 		fmt.Fprintf(out, "version\t%d\n", h.version)
 		fmt.Fprintf(out, "shape\t%d\n", h.shape)
 	}
