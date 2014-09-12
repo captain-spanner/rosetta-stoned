@@ -6,7 +6,7 @@ import (
 
 type Shapefile struct {
 	path	string
-	shp	*Shp
+	shp	*Shapes
 	shx	*Index
 	dbase	*Dbase
 }
@@ -14,7 +14,7 @@ type Shapefile struct {
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	sf := new(Shapefile)
 	sf.path = n
-	s, err := MakeShp(n+".shp", out)
+	s, err := MakeShapes(n+".shp", out)
 	if err != nil {
 		return nil, err
 	}

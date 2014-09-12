@@ -4,7 +4,7 @@ import (
 	"io"
 )
 
-type Shp struct {
+type Shapes struct {
 	path    string
 	size    int
 	body    []byte
@@ -12,8 +12,8 @@ type Shp struct {
 	err	string
 }
 
-func MakeShp(n string, out io.Writer) (*Shp, error) {
-	s := new(Shp)
+func MakeShapes(n string, out io.Writer) (*Shapes, error) {
+	s := new(Shapes)
 	s.path = n
 	body, err := ReadFile(n)
 	if err != nil {
@@ -29,6 +29,6 @@ func MakeShp(n string, out io.Writer) (*Shp, error) {
 	return s, nil
 }
 
-func (s *Shp) Error() string {
+func (s *Shapes) Error() string {
 	return "shp: "+s.err
 }
