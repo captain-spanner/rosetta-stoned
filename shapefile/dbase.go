@@ -50,9 +50,9 @@ func (d *Dbase) decode(out io.Writer) error {
 	}
 	body := d.body
 	d.tag = body[0]
-	d.nrecs = int(sb32(body[4:]))
-	d.hdrsize = int(sb16(body[8:]))
-	d.recsize = int(sb16(body[10:]))
+	d.nrecs = int(sl32(body[4:]))
+	d.hdrsize = int(sl16(body[8:]))
+	d.recsize = int(sl16(body[10:]))
 	if out != nil {
 		fmt.Fprintln(out, "dbase:")
 		fmt.Fprintf(out, "path\t%q\n", d.path)

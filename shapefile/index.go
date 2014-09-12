@@ -43,9 +43,9 @@ func MakeIndex(n string, out io.Writer) (*Index, error) {
 	v := make([]desc, z, z)
 	o := Hdrsize
 	for i := 0; i < z; i++ {
-		v[i].off = int(sb32(body[o:]))
+		v[i].off = int(sb32(body[o:])) * 2
 		o += 4
-		v[i].size = int(sb32(body[o:]))
+		v[i].size = int(sb32(body[o:])) * 2
 		o += 4
 	}
 	s.recs = v

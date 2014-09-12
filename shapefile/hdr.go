@@ -25,8 +25,8 @@ type bbox struct {
 
 func MakeHeader(b []byte, out io.Writer) *Header {
 	h := new(Header)
-	h.version = int(sb32(b[28:]))
-	h.shape = int(sb32(b[32:]))
+	h.version = int(sl32(b[28:]))
+	h.shape = int(sl32(b[32:]))
 	makebbox(b[36:], &h.xybox)
 	makebbox(b[68:], &h.zmbox)
 	if out != nil {

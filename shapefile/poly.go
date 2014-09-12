@@ -15,7 +15,7 @@ func (s *Shapefile) decode(out io.Writer) error {
 		if off < xmin {
 			xmin = off
 		}
-		ext := off + v[i].size
+		ext := off + v[i].size + 8
 		if ext > xmax {
 			xmax = ext
 		}

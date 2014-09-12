@@ -1,6 +1,7 @@
 package shapefile
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -18,6 +19,9 @@ func MakeShapes(n string, out io.Writer) (*Shapes, error) {
 	body, err := ReadFile(n)
 	if err != nil {
 		return nil, err
+	}
+	if out != nil {
+		fmt.Fprintln(out, "shapes:")
 	}
 	s.body = body
 	s.size = len(body)
