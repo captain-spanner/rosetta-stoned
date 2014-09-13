@@ -6,18 +6,18 @@ import (
 )
 
 type polygons struct {
-	count	int
-	polys	[]polygon
+	count int
+	polys []polygon
 }
 
 type polygon struct {
-	count	int
-	points	[]point
+	count  int
+	points []point
 }
 
 type point struct {
-	x	float64
-	y	float64
+	x float64
+	y float64
 }
 
 func (s *Shapefile) decode(out io.Writer) error {
@@ -43,4 +43,14 @@ func (s *Shapefile) decode(out io.Writer) error {
 		fmt.Fprintf(out, "size0\t%d\n", v[0].size)
 	}
 	return nil
+}
+
+func (s *Shapefile) Getrec(n int) []byte {
+	if n < 0 || n >= s.shx.nrecs {
+		return nil
+	}
+	d := s.shx.recs[n]
+	o := d.off
+	x := o + 8 + d.size
+	return s.shp.body[o:x]
 }

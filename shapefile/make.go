@@ -9,6 +9,7 @@ type Shapefile struct {
 	shp	*Shapes
 	shx	*Index
 	dbase	*Dbase
+	nrecs	int
 	polys	[]polygons
 }
 

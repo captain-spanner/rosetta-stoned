@@ -1,7 +1,6 @@
 package shapefile
 
 import (
-	"errors"
 	"fmt"
 	"io"
 )
@@ -36,8 +35,8 @@ func MakeShapes(n string, out io.Writer) (*Shapes, error) {
 	}
 	s.hdr = MakeHeader(body, out)
 	if s.hdr.shape != spoly {
-		m := fmt.Sprintf("shape type %d not supported", s.hdr.shape)
-		return nil, errors.New(m)
+		s.err = fmt.Sprintf("shape type %d not supported", s.hdr.shape)
+		return nil, s
 	}
 	return s, nil
 }
