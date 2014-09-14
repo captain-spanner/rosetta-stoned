@@ -10,7 +10,7 @@ type Shapefile struct {
 	shx	*Index
 	dbase	*Dbase
 	nrecs	int
-	polys	[]polygons
+	polys	[]*polygons
 }
 
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
