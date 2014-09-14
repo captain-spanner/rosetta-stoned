@@ -36,7 +36,7 @@ func MakeDbase(n string, out io.Writer) (*Dbase, error) {
 }
 
 func (d *Dbase) Error() string {
-	return "dbase: "+d.err
+	return "dbase: " + d.err
 }
 
 func (d *Dbase) lencheck(n int, s string) error {
@@ -76,7 +76,7 @@ func (d *Dbase) decode(out io.Writer) error {
 		fmt.Fprintf(out, "remains\t%d\n", d.size-d.fpoff)
 		fmt.Fprintf(out, "need\t%d\n", d.nrecs*d.recsize+1)
 	}
-	o = d.fpoff+d.nrecs*d.recsize
+	o = d.fpoff + d.nrecs*d.recsize
 	err = d.lencheck(o+1, "data")
 	if err != nil {
 		return err

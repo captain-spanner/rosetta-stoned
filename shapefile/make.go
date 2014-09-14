@@ -5,12 +5,12 @@ import (
 )
 
 type Shapefile struct {
-	path	string
-	shp	*Shapes
-	shx	*Index
-	dbase	*Dbase
-	nrecs	int
-	polys	[]*polygons
+	path  string
+	shp   *Shapes
+	shx   *Index
+	dbase *Dbase
+	nrecs int
+	polys []*polygons
 }
 
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {

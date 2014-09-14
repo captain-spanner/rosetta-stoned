@@ -1,8 +1,8 @@
 package shapefile
 
 import (
-	"fmt"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 )

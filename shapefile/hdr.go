@@ -10,17 +10,17 @@ const (
 )
 
 type Header struct {
-	version	int
-	shape	int
-	xybox	bbox
-	zmbox	bbox
+	version int
+	shape   int
+	xybox   bbox
+	zmbox   bbox
 }
 
 type bbox struct {
-	xmin	float64
-	ymin	float64
-	xmax	float64
-	ymax	float64
+	xmin float64
+	ymin float64
+	xmax float64
+	ymax float64
 }
 
 func MakeHeader(b []byte, out io.Writer) *Header {

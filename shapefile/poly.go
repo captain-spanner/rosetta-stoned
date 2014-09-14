@@ -7,8 +7,8 @@ import (
 
 type polygons struct {
 	bounds bbox
-	count int
-	polys []*polygon
+	count  int
+	polys  []*polygon
 }
 
 type polygon struct {
@@ -46,10 +46,10 @@ func (s *Shapefile) decode(out io.Writer) error {
 }
 
 func (s *Shapefile) decpolys(out io.Writer) {
-	n:= s.shx.nrecs
+	n := s.shx.nrecs
 	s.nrecs = n
 	v := make([]*polygons, n, n)
-	for i:= 0; i < n; i++ {
+	for i := 0; i < n; i++ {
 		b := s.getrec(i)
 		rn := int(sb32(b[0:]))
 		data := b[8:]
@@ -75,9 +75,9 @@ func makepolys(b []byte) *polygons {
 	np := int(sl32(b[40:]))
 	p.count = n
 	zo := 44
-	po := 44 + 4 * n
+	po := 44 + 4*n
 	v := make([]*polygon, n, n)
-	o := make([]int, n +1, n + 1)
+	o := make([]int, n+1, n+1)
 	for i := 0; i < n; i++ {
 		o[i] = int(sl32(b[zo:]))
 		zo += 4

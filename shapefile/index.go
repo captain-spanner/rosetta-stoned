@@ -6,18 +6,18 @@ import (
 )
 
 type Index struct {
-	path    string
-	size    int
-	body    []byte
-	nrecs	int
-	recs	[]desc
-	hdr	*Header
-	err	string
+	path  string
+	size  int
+	body  []byte
+	nrecs int
+	recs  []desc
+	hdr   *Header
+	err   string
 }
 
 type desc struct {
-	off	int
-	size	int
+	off  int
+	size int
 }
 
 func MakeIndex(n string, out io.Writer) (*Index, error) {
@@ -53,7 +53,7 @@ func MakeIndex(n string, out io.Writer) (*Index, error) {
 }
 
 func (s *Index) Error() string {
-	return "shx: "+s.err
+	return "shx: " + s.err
 }
 
 func (s *Index) Nrecs() int {

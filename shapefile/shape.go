@@ -10,11 +10,11 @@ const (
 )
 
 type Shapes struct {
-	path    string
-	size    int
-	body    []byte
-	hdr	*Header
-	err	string
+	path string
+	size int
+	body []byte
+	hdr  *Header
+	err  string
 }
 
 func MakeShapes(n string, out io.Writer) (*Shapes, error) {
@@ -42,5 +42,5 @@ func MakeShapes(n string, out io.Writer) (*Shapes, error) {
 }
 
 func (s *Shapes) Error() string {
-	return "shp: "+s.err
+	return "shp: " + s.err
 }
