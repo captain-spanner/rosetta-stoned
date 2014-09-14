@@ -81,7 +81,7 @@ func makepolys(b []byte) *polygons {
 		zo += 4
 		g := new(polygon)
 		g.count = c
-		ps := make([]point, n, n)
+		ps := make([]point, c, c)
 		for j := 0; j < c; j++ {
 			makepoint(b[po:], &ps[j])
 			po += 16
