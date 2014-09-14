@@ -32,5 +32,9 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	}
 	sf.dbase = d
 	sf.decode(out)
+	if out != nil {
+		sf.shp.hdr.xybox.print(out)
+		sf.polys[0].bounds.print(out)
+	}
 	return sf, nil
 }
