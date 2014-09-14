@@ -70,15 +70,21 @@ func (s *Shapefile) getrec(n int) []byte {
 
 func makepolys(b []byte) *polygons {
 	p := new(polygons)
-	makebbox(b[0:], &p.bounds)
-	n := int(sl32(b[32:]))
+	makebbox(b[4:], &p.bounds)
+	n := int(sl32(b[36:]))
+	np := int(sl32(b[40:]))
 	p.count = n
-	zo := 40
-	po := 40 + 4 * n
+	zo := 44
+	po := 44 + 4 * n
 	v := make([]*polygon, n, n)
+	o := make([]int, n +1, n + 1)
 	for i := 0; i < n; i++ {
-		c := int(sl32(b[zo:]))
+		o[i] = int(sl32(b[zo:]))
 		zo += 4
+	}
+	o[n] = np
+	for i := 0; i < n; i++ {
+		c := o[i+1] - o[i]
 		g := new(polygon)
 		g.count = c
 		ps := make([]point, c, c)
