@@ -12,6 +12,8 @@ type polygons struct {
 }
 
 type polygon struct {
+	bounds bbox
+	cw     bool
 	count  int
 	points []point
 }
@@ -93,6 +95,7 @@ func makepolys(b []byte) *polygons {
 			po += 16
 		}
 		g.points = ps
+		g.calc()
 		v[i] = g
 	}
 	p.polys = v
@@ -102,4 +105,44 @@ func makepolys(b []byte) *polygons {
 func makepoint(b []byte, p *point) {
 	p.x = fl64(b[0:])
 	p.y = fl64(b[8:])
+}
+
+func (p *polygon) calc() {
+	c := p.count
+	ps := p.points
+	xmin := 360.
+	ymin := 360.
+	xmax := -360.
+	ymax := -360.
+	area := 0.
+	for i := 0; i < c; i++ {
+		x := ps[i].x
+		y := ps[i].y
+		if x < xmin {
+			xmin = x
+		}
+		if x > xmax {
+			xmax = x
+		}
+		if y < ymin {
+			ymin = y
+		}
+		if y > ymax {
+			ymax = y
+		}
+		var xn, yn float64
+		if i == c-1 {
+			xn = ps[0].x
+			yn = ps[0].y
+		} else {
+			xn = ps[i+1].x
+			yn = ps[i+1].y
+		}
+		area += x*yn - xn*y
+	}
+	p.bounds.xmin = xmin
+	p.bounds.ymin = ymin
+	p.bounds.xmax = xmax
+	p.bounds.ymax = ymax
+	p.cw = area < 0.
 }

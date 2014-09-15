@@ -6,6 +6,7 @@ import (
 
 type Shapefile struct {
 	path  string
+	box   bbox
 	shp   *Shapes
 	shx   *Index
 	dbase *Dbase
@@ -33,7 +34,8 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	sf.dbase = d
 	sf.decode(out)
 	if out != nil {
-		sf.shp.hdr.xybox.print(out)
+		sf.box = sf.shp.hdr.xybox
+		sf.box.print(out)
 		sf.polys[0].bounds.print(out)
 	}
 	return sf, nil
