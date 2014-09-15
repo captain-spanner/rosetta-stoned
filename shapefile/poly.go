@@ -7,6 +7,7 @@ import (
 
 type polygons struct {
 	bounds bbox
+	holes	int
 	count  int
 	polys  []*polygon
 }
@@ -55,7 +56,12 @@ func (s *Shapefile) decpolys(out io.Writer) {
 		b := s.getrec(i)
 		rn := int(sb32(b[0:]))
 		data := b[8:]
-		v[rn-1] = makepolys(data)
+		p := makepolys(data)
+		v[rn-1] = p
+		s.holes += p.holes
+		if mkplot {
+			s.mkplotfile(i, p)
+		}
 	}
 	s.polys = v
 }
@@ -97,6 +103,9 @@ func makepolys(b []byte) *polygons {
 		g.points = ps
 		g.calc()
 		v[i] = g
+		if !g.cw {
+			p.holes++
+		}
 	}
 	p.polys = v
 	return p
