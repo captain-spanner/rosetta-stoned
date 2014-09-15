@@ -1,6 +1,7 @@
 package shapefile
 
 import (
+	"fmt"
 	"io"
 )
 
@@ -37,6 +38,8 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		sf.box = sf.shp.hdr.xybox
 		sf.box.print(out)
 		sf.polys[0].bounds.print(out)
+		sf.polys[0].polys[0].bounds.print(out)
+		fmt.Fprintln(out, "cw", sf.polys[0].polys[0].cw)
 	}
 	return sf, nil
 }
