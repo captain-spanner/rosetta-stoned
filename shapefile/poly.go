@@ -157,10 +157,17 @@ func (p *polygon) calc() {
 }
 
 func (s *Shapefile) analyze() error {
-	n := s.nrecs
-	p := s.polys
-	for i := 0; i < n; i++ {
-		p[i].bounds.inside(&s.box)
+	for i, p := range s.polys {
+		if !p.bounds.inside(&s.box) {
+			s.err = fmt.Sprintf("ps %d not contained", i)
+			return s
+		}
+		for j, q := range p.polys {
+			if !q.bounds.inside(&p.bounds) {
+				s.err = fmt.Sprintf("ps (%d %d) not contained", i, j)
+				return s
+			}
+		}
 	}
 	return nil
 }
