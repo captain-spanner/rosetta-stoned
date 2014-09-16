@@ -26,3 +26,7 @@ func (b *bbox) print(out io.Writer) {
 func (b *bbox) inside(o *bbox) bool {
 	return b.xmin >= o.xmin && b.ymin >= o.ymin && b.xmax <= o.xmax && b.ymax <= o.ymax
 }
+
+func (b *bbox) area() float64 {
+	return (b.xmax - b.xmin) * (b.ymax - b.ymin)
+}

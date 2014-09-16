@@ -7,9 +7,10 @@ import (
 
 type polygons struct {
 	bounds bbox
-	holes	int
+	holes  int
 	count  int
 	polys  []*polygon
+	regs   []*region
 }
 
 type polygon struct {
@@ -17,6 +18,12 @@ type polygon struct {
 	cw     bool
 	count  int
 	points []point
+}
+
+type region struct {
+	poly *polygon
+	hole *polygon
+	i    int
 }
 
 type point struct {
@@ -168,6 +175,58 @@ func (s *Shapefile) analyze() error {
 				return s
 			}
 		}
+		s.makeregions(p, i)
+		if s.err != "" {
+			return s
+		}
 	}
 	return nil
+}
+
+func (s *Shapefile) makeregions(p *polygons, i int) {
+	if p.holes == 0 {
+		s.unholed(p, i)
+	} else {
+		s.holed(p, i)
+	}
+}
+
+func (s *Shapefile) holed(p *polygons, i int) {
+	n := p.count
+	h := make([]polygon, n, n)
+	for j, q := range p.polys {
+		if !q.cw {
+			area := 0.
+			x := -1
+			for k, r := range p.polys {
+				if !r.cw {
+					continue
+				}
+				if r.bounds.inside(&q.bounds) {
+					if x < 0 {
+						area = r.bounds.area()
+						x = k
+					} else {
+						a := r.bounds.area()
+						if a < area {
+							area = a
+							x = k
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func (s *Shapefile) unholed(p *polygons, i int) {
+	n := p.count
+	rs := make([]*region, n, n)
+	for j, q := range p.polys {
+		r := new(region)
+		r.poly = q
+		r.i = i
+		rs[j] = r
+	}
+	p.regs = rs
 }
