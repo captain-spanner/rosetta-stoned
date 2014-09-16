@@ -32,6 +32,7 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		return nil, err
 	}
 	sf.shp = s
+	sf.box = sf.shp.hdr.xybox
 	x, err := MakeIndex(n+".shx", out)
 	if err != nil {
 		return nil, err
@@ -44,14 +45,13 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	sf.dbase = d
 	sf.decode(out)
 	if out != nil {
-		sf.box = sf.shp.hdr.xybox
 		sf.box.print(out)
 		sf.polys[0].bounds.print(out)
 		sf.polys[0].polys[0].bounds.print(out)
 		fmt.Fprintln(out, "cw", sf.polys[0].polys[0].cw)
 		fmt.Fprintln(out, "holes", sf.holes)
 	}
-	return sf, nil
+	return sf, sf.analyze()
 }
 
 func (s *Shapefile) Error() string {

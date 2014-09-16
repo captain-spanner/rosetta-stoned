@@ -155,3 +155,12 @@ func (p *polygon) calc() {
 	p.bounds.ymax = ymax
 	p.cw = area < 0.
 }
+
+func (s *Shapefile) analyze() error {
+	n := s.nrecs
+	p := s.polys
+	for i := 0; i < n; i++ {
+		p[i].bounds.inside(&s.box)
+	}
+	return nil
+}

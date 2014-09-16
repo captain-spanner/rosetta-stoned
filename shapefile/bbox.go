@@ -22,3 +22,7 @@ func makebbox(b []byte, bb *bbox) {
 func (b *bbox) print(out io.Writer) {
 	fmt.Fprintf(out, "[(%f, %f) (%f %f)]\n", b.xmin, b.ymin, b.xmax, b.ymax)
 }
+
+func (b *bbox) inside(o *bbox) bool {
+	return b.xmin >= o.xmin && b.ymin >= o.ymin && b.xmax <= o.xmax && b.ymax <= o.ymax
+}
