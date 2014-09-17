@@ -172,6 +172,10 @@ func (s *Shapefile) analyze() error {
 			return s
 		}
 		for j, q := range p.polys {
+			if !q.bounds.normal() {
+				s.err = fmt.Sprintf("ps (%d %d) not normalized", i, j)
+				return s
+			}
 			if !q.bounds.inside(&p.bounds) {
 				s.err = fmt.Sprintf("ps (%d %d) not contained", i, j)
 				return s
