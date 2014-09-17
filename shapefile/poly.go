@@ -182,10 +182,6 @@ func (s *Shapefile) analyze() error {
 }
 
 func (s *Shapefile) makeregions(p *polygons, i int) {
-	s.addregions(p, i)
-}
-
-func (s *Shapefile) addregions(p *polygons, i int) {
 	for _, q := range p.polys {
 		r := new(region)
 		r.poly = q
