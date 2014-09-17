@@ -10,7 +10,6 @@ type polygons struct {
 	holes  int
 	count  int
 	polys  []*polygon
-	regs   []*region
 }
 
 type polygon struct {
@@ -22,7 +21,6 @@ type polygon struct {
 
 type region struct {
 	poly *polygon
-	hole *polygon
 	i    int
 }
 
@@ -184,58 +182,14 @@ func (s *Shapefile) analyze() error {
 }
 
 func (s *Shapefile) makeregions(p *polygons, i int) {
-//	if p.holes == 0 {
-//		s.unholed(p, i)
-//	} else {
-//		s.holed(p, i)
-//	}
-	s.unholed(p, i)
+	s.addregions(p, i)
 }
 
-func (s *Shapefile) holed(p *polygons, i int) {
-	n := p.count
-	h := make([]*polygon, n, n)
-	for j, q := range p.polys {
-		if !q.cw {
-			area := 0.
-			x := -1
-			for k, r := range p.polys {
-				if !r.cw {
-					continue
-				}
-				if r.bounds.inside(&q.bounds) {
-					if x < 0 {
-						area = r.bounds.area()
-						x = k
-					} else {
-						a := r.bounds.area()
-						if a < area {
-							area = a
-							x = k
-						}
-					}
-				}
-			}
-			if x < 0 {
-				fmt.Printf("hole (%d, %d) not enclosed\n", i, j)
-				continue
-			} else {
-				fmt.Printf("hole (%d, %d) in %d\n", i, j, x)
-				continue
-			}
-			h[x] = q
-		}
-	}
-}
-
-func (s *Shapefile) unholed(p *polygons, i int) {
-	n := p.count
-	rs := make([]*region, n, n)
-	for j, q := range p.polys {
+func (s *Shapefile) addregions(p *polygons, i int) {
+	for _, q := range p.polys {
 		r := new(region)
 		r.poly = q
 		r.i = i
-		rs[j] = r
+		s.regs = append(s.regs, r)
 	}
-	p.regs = rs
 }

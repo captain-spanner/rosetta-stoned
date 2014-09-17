@@ -1,7 +1,6 @@
 package shapefile
 
 import (
-	"fmt"
 	"io"
 	"strings"
 )
@@ -20,6 +19,7 @@ type Shapefile struct {
 	dbase *Dbase
 	nrecs int
 	polys []*polygons
+	regs  []*region
 	err   string
 }
 
@@ -48,9 +48,8 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		sf.box.print(out)
 		sf.polys[0].bounds.print(out)
 		sf.polys[0].polys[0].bounds.print(out)
-//		fmt.Fprintln(out, "cw", sf.polys[0].polys[0].cw)
-//		fmt.Fprintln(out, "holes", sf.holes)
 	}
+	sf.regs = make([]*region, 0)
 	return sf, sf.analyze()
 }
 
