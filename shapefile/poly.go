@@ -184,16 +184,17 @@ func (s *Shapefile) analyze() error {
 }
 
 func (s *Shapefile) makeregions(p *polygons, i int) {
-	if p.holes == 0 {
-		s.unholed(p, i)
-	} else {
-		s.holed(p, i)
-	}
+//	if p.holes == 0 {
+//		s.unholed(p, i)
+//	} else {
+//		s.holed(p, i)
+//	}
+	s.unholed(p, i)
 }
 
 func (s *Shapefile) holed(p *polygons, i int) {
 	n := p.count
-	h := make([]polygon, n, n)
+	h := make([]*polygon, n, n)
 	for j, q := range p.polys {
 		if !q.cw {
 			area := 0.
@@ -215,6 +216,14 @@ func (s *Shapefile) holed(p *polygons, i int) {
 					}
 				}
 			}
+			if x < 0 {
+				fmt.Printf("hole (%d, %d) not enclosed\n", i, j)
+				continue
+			} else {
+				fmt.Printf("hole (%d, %d) in %d\n", i, j, x)
+				continue
+			}
+			h[x] = q
 		}
 	}
 }
