@@ -163,6 +163,10 @@ func (p *polygon) calc() {
 
 func (s *Shapefile) analyze() error {
 	for i, p := range s.polys {
+		if !p.bounds.normal() {
+			s.err = fmt.Sprintf("ps %d not normalized", i)
+			return s
+		}
 		if !p.bounds.inside(&s.box) {
 			s.err = fmt.Sprintf("ps %d not contained", i)
 			return s

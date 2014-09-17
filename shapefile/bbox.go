@@ -30,3 +30,7 @@ func (b *bbox) inside(o *bbox) bool {
 func (b *bbox) area() float64 {
 	return (b.xmax - b.xmin) * (b.ymax - b.ymin)
 }
+
+func (b *bbox) normal() bool {
+	return b.xmax > b.xmin && b.ymax > b.ymin
+}
