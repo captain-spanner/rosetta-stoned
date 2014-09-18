@@ -18,3 +18,11 @@ func MakeQuad(b *bbox) *quad {
 	q.box = *b
 	return q
 }
+
+func (q *quad) populate() {
+	q.qbox = q.box.divide()
+	q.down = make([]*quad, 4, 4)
+	for i := 0; i < 4; i++ {
+		q.down[i] = MakeQuad(q.qbox[i])
+	}
+}

@@ -38,3 +38,36 @@ func (b *bbox) area() float64 {
 func (b *bbox) normal() bool {
 	return b.xmax > b.xmin && b.ymax > b.ymin
 }
+
+func (b *bbox) divide() []*bbox {
+	d := make([]*bbox, 4, 4)
+	mx := (b.xmax - b.xmin) / 2.
+	my := (b.ymax - b.ymin) / 2.
+	for i := 0; i < 4; i++ {
+		n := new(bbox)
+		switch i {
+		case 0:
+			n.xmin = b.xmin
+			n.xmax = mx
+			n.ymin = my
+			n.ymax = b.ymax
+		case 1:
+			n.xmin = mx
+			n.xmax = b.xmax
+			n.ymin = my
+			n.ymax = b.ymax
+		case 2:
+			n.xmin = b.xmin
+			n.xmax = mx
+			n.ymin = b.ymin
+			n.ymax = my
+		case 3:
+			n.xmin = mx
+			n.xmax = b.xmax
+			n.ymin = b.ymin
+			n.ymax = my
+		}
+		d[i] = n
+	}                   
+	return d
+}
