@@ -19,7 +19,7 @@ type Shapefile struct {
 	dbase *Dbase
 	nrecs int
 	polys []*polygons
-	regs  []*region
+	regs  []*Region
 	err   string
 }
 
@@ -49,7 +49,7 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 		sf.polys[0].bounds.print(out)
 		sf.polys[0].polys[0].bounds.print(out)
 	}
-	sf.regs = make([]*region, 0)
+	sf.regs = make([]*Region, 0)
 	return sf, sf.analyze()
 }
 

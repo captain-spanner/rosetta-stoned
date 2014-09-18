@@ -19,7 +19,7 @@ type polygon struct {
 	points []point
 }
 
-type region struct {
+type Region struct {
 	poly *polygon
 	i    int
 }
@@ -191,7 +191,7 @@ func (s *Shapefile) analyze() error {
 
 func (s *Shapefile) makeregions(p *polygons, i int) {
 	for _, q := range p.polys {
-		r := new(region)
+		r := new(Region)
 		r.poly = q
 		r.i = i
 		s.regs = append(s.regs, r)

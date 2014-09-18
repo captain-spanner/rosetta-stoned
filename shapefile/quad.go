@@ -5,12 +5,12 @@ type quad struct {
 	qbox []*bbox
 	down []*quad
 	only *subreg
-	full []*region
+	full []*Region
 }
 
 type subreg struct {
 	box bbox
-	reg *region
+	reg *Region
 }
 
 func MakeQuad(b *bbox) *quad {
@@ -19,7 +19,7 @@ func MakeQuad(b *bbox) *quad {
 	return q
 }
 
-func (q *quad) AddRegion(r *region) {
+func (q *quad) AddRegion(r *Region) {
 	s := new(subreg)
 	s.box = r.poly.bounds
 	s.reg = r
