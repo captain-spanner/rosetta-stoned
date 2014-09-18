@@ -19,6 +19,15 @@ func MakeQuad(b *bbox) *quad {
 	return q
 }
 
+func (q *quad) AddRegion(r *region) {
+	s := new(subreg)
+	s.box = r.poly.bounds
+	s.reg = r
+}
+
+func (q *quad) addsubreg(s *subreg) {
+}
+
 func (q *quad) populate() {
 	q.qbox = q.box.divide()
 	q.down = make([]*quad, 4, 4)
