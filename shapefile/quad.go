@@ -23,6 +23,7 @@ func (q *quad) AddRegion(r *region) {
 	s := new(subreg)
 	s.box = r.poly.bounds
 	s.reg = r
+	q.addsubreg(s)
 }
 
 func (q *quad) addsubreg(s *subreg) {
