@@ -195,5 +195,13 @@ func (s *Shapefile) analyze() error {
 			return s
 		}
 	}
+	q := MakeQuad(&s.box)
+	s.quad = q
+	for i, r := range s.regs {
+		if Qdebug {
+			fmt.Printf("%d:\n", i)
+		}
+		q.AddRegion(r)
+	}
 	return nil
 }

@@ -20,6 +20,7 @@ type Shapefile struct {
 	nrecs int
 	polys []*polygons
 	regs  []*Region
+	quad  *Quad
 	err   string
 }
 

@@ -1,5 +1,15 @@
 package shapefile
 
+import (
+	"fmt"
+	"os"
+)
+
+const (
+	Qdebug  = false
+	Qdebug2 = false
+)
+
 type Quad struct {
 	box  bbox
 	qbox []*bbox
@@ -29,23 +39,35 @@ func (q *Quad) AddRegion(r *Region) {
 
 func (s *subreg) mksubreg(b *bbox) *subreg {
 	r := new(subreg)
-	r.depth = s.depth+1
+	r.depth = s.depth + 1
 	r.box = *b
 	r.reg = s.reg
 	return r
 }
 
 func (q *Quad) addsubreg(s *subreg) {
+	if Qdebug {
+		fmt.Print("quad: ")
+		q.box.print(os.Stdout)
+		fmt.Print("sub: ")
+		s.box.print(os.Stdout)
+	}
 	if q.down == nil {
 		if q.only == nil {
+			if Qdebug {
+				fmt.Println("set only")
+			}
 			q.only = s
 			return
 		}
 		q.populate()
+		if Qdebug {
+			fmt.Println("proc only")
+		}
 		q.addsubreg(s)
 		q.only = nil
 	}
-	if q.box.equal(&s.box) {
+	if q.box.full(&s.box) {
 		if q.full == nil {
 			q.full = make([]*Region, 0)
 		}
@@ -53,7 +75,7 @@ func (q *Quad) addsubreg(s *subreg) {
 		return
 	}
 	for i := 0; i < 4; i++ {
-		if q.qbox[i].inside(&s.box) {
+		if s.box.inside(q.qbox[i]) {
 			s.depth++
 			q.down[i].addsubreg(s)
 			return

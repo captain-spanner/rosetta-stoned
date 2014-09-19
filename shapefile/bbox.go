@@ -3,6 +3,7 @@ package shapefile
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
 type bbox struct {
@@ -23,8 +24,14 @@ func (b *bbox) print(out io.Writer) {
 	fmt.Fprintf(out, "[(%f, %f) (%f %f)]\n", b.xmin, b.ymin, b.xmax, b.ymax)
 }
 
-func (b *bbox) equal(o *bbox) bool {
-	return b.xmin == o.xmin && b.ymin == o.ymin && b.xmax == o.xmax && b.ymax == o.ymax
+const (
+	eps = 360.0 / float64(1 << 13)
+	eps2 = eps*eps
+)
+
+func (b *bbox) full(o *bbox) bool {
+	return b.area() - o.area() <= eps2
+//	return b.xmin == o.xmin && b.ymin == o.ymin && b.xmax == o.xmax && b.ymax == o.ymax
 }
 
 func (b *bbox) inside(o *bbox) bool {
@@ -41,8 +48,11 @@ func (b *bbox) normal() bool {
 
 func (b *bbox) divide() []*bbox {
 	d := make([]*bbox, 4, 4)
-	mx := (b.xmax - b.xmin) / 2.
-	my := (b.ymax - b.ymin) / 2.
+	mx := (b.xmin + b.xmax) / 2.
+	my := (b.ymin + b.ymax) / 2.
+	if Qdebug2 {
+		fmt.Printf("divide: mx = %f, my = %f\n", mx, my)
+	}
 	for i := 0; i < 4; i++ {
 		n := new(bbox)
 		switch i {
@@ -68,6 +78,9 @@ func (b *bbox) divide() []*bbox {
 			n.ymax = my
 		}
 		d[i] = n
+		if Qdebug2 {
+			n.print(os.Stdout)
+		}
 	}                   
 	return d
 }
