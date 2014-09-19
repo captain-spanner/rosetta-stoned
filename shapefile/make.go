@@ -46,9 +46,9 @@ func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	sf.dbase = d
 	sf.decode(out)
 	if out != nil {
-		sf.box.print(out)
-		sf.polys[0].bounds.print(out)
-		sf.polys[0].polys[0].bounds.print(out)
+		sf.box.prints(out, "sf")
+		sf.polys[0].bounds.prints(out, "1st")
+		sf.polys[0].polys[0].bounds.prints(out, "1st of 1st")
 	}
 	sf.regs = make([]*Region, 0)
 	return sf, sf.analyze()

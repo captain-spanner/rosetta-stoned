@@ -24,14 +24,13 @@ func (b *bbox) print(out io.Writer) {
 	fmt.Fprintf(out, "[(%f, %f) (%f %f)]\n", b.xmin, b.ymin, b.xmax, b.ymax)
 }
 
-const (
-	eps = 360.0 / float64(1 << 13)
-	eps2 = eps*eps
-)
+func (b *bbox) prints(out io.Writer, s string) {
+	fmt.Fprintf(out, "%s: ", s)
+	b.print(out)
+}
 
-func (b *bbox) full(o *bbox) bool {
+func (b *bbox) full(o *bbox, eps2 float64) bool {
 	return b.area() - o.area() <= eps2
-//	return b.xmin == o.xmin && b.ymin == o.ymin && b.xmax == o.xmax && b.ymax == o.ymax
 }
 
 func (b *bbox) inside(o *bbox) bool {

@@ -24,6 +24,11 @@ type subreg struct {
 	reg   *Region
 }
 
+const (
+	eps = 360.0 / float64(1 << 13)
+	eps2 = eps*eps
+)
+
 func MakeQuad(b *bbox) *Quad {
 	q := new(Quad)
 	q.box = *b
@@ -67,7 +72,7 @@ func (q *Quad) addsubreg(s *subreg) {
 		q.addsubreg(s)
 		q.only = nil
 	}
-	if q.box.full(&s.box) {
+	if q.box.full(&s.box, eps2) {
 		if q.full == nil {
 			q.full = make([]*Region, 0)
 		}
