@@ -27,6 +27,14 @@ func (q *Quad) AddRegion(r *Region) {
 	q.addsubreg(s)
 }
 
+func (s *subreg) mksubreg(b *bbox) *subreg {
+	r := new(subreg)
+	r.depth = s.depth+1
+	r.box = *b
+	r.reg = s.reg
+	return r
+}
+
 func (q *Quad) addsubreg(s *subreg) {
 	if q.down == nil {
 		if q.only == nil {
@@ -43,6 +51,19 @@ func (q *Quad) addsubreg(s *subreg) {
 		}
 		q.full = append(q.full, s.reg)
 		return
+	}
+	for i := 0; i < 4; i++ {
+		if q.qbox[i].inside(&s.box) {
+			s.depth++
+			q.down[i].addsubreg(s)
+			return
+		}
+	}
+	for i := 0; i < 4; i++ {
+		b := q.qbox[i].intersection(&s.box)
+		if b != nil {
+			q.down[i].addsubreg(s.mksubreg(b))
+		}
 	}
 }
 

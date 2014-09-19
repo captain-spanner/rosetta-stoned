@@ -71,3 +71,35 @@ func (b *bbox) divide() []*bbox {
 	}                   
 	return d
 }
+
+func max(a float64, b float64) float64 {
+	if a > b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func min(a float64, b float64) float64 {
+	if a < b {
+		return a
+	} else {
+		return b
+	}
+}
+
+func (b *bbox) intersection(a *bbox) *bbox {
+	xmin := max(a.xmin, b.xmin)
+	ymin := max(a.ymin, b.ymin)
+	xmax := min(a.xmax, b.xmax)
+	ymax := min(a.ymax, b.ymax)
+	if xmax < xmin || ymax < ymin {
+		return nil
+	}
+	r := new(bbox)
+	r.xmin = xmin
+	r.ymin = ymin
+	r.xmax = xmax
+	r.ymax = ymax
+	return r
+}

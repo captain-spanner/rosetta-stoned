@@ -161,6 +161,15 @@ func (p *polygon) calc() {
 	p.cw = area < 0.
 }
 
+func (s *Shapefile) makeregions(p *polygons, i int) {
+	for _, q := range p.polys {
+		r := new(Region)
+		r.poly = q
+		r.i = i
+		s.regs = append(s.regs, r)
+	}
+}
+
 func (s *Shapefile) analyze() error {
 	for i, p := range s.polys {
 		if !p.bounds.normal() {
@@ -187,13 +196,4 @@ func (s *Shapefile) analyze() error {
 		}
 	}
 	return nil
-}
-
-func (s *Shapefile) makeregions(p *polygons, i int) {
-	for _, q := range p.polys {
-		r := new(Region)
-		r.poly = q
-		r.i = i
-		s.regs = append(s.regs, r)
-	}
 }
