@@ -56,10 +56,10 @@ func (b *bbox) divide() []*bbox {
 		n := new(bbox)
 		switch i {
 		case 0:
-			n.xmin = b.xmin
-			n.xmax = mx
-			n.ymin = my
-			n.ymax = b.ymax
+			n.xmin = mx
+			n.xmax = b.xmax
+			n.ymin = b.ymin
+			n.ymax = my
 		case 1:
 			n.xmin = mx
 			n.xmax = b.xmax
@@ -71,10 +71,10 @@ func (b *bbox) divide() []*bbox {
 			n.ymin = b.ymin
 			n.ymax = my
 		case 3:
-			n.xmin = mx
-			n.xmax = b.xmax
-			n.ymin = b.ymin
-			n.ymax = my
+			n.xmin = b.xmin
+			n.xmax = mx
+			n.ymin = my
+			n.ymax = b.ymax
 		}
 		d[i] = n
 		if Qdebug2 {
