@@ -10,18 +10,24 @@ const (
 )
 
 type Shapefile struct {
-	path  string
-	dir   string
-	box   bbox
-	holes int
-	shp   *Shapes
-	shx   *Index
-	dbase *Dbase
-	nrecs int
-	polys []*polygons
-	regs  []*Region
-	quad  *Quad
-	err   string
+	path    string
+	dir     string
+	box     bbox
+	holes   int
+	shp     *Shapes
+	shx     *Index
+	dbase   *Dbase
+	nrecs   int
+	polys   []*polygons
+	regs    []*Region
+	quad    *Quad
+	deployq chan *deployreq
+	err     string
+}
+
+type deployreq struct {
+	poly *polygon
+	resp chan bool
 }
 
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
