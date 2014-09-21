@@ -5,12 +5,30 @@ type deployreq struct {
 	resp chan bool
 }
 
+type seg bbox
+
 type indata struct {
 }
 
 type inreq struct {
 	pt   *point
 	resp chan bool
+}
+
+func mkseg(p *point, q *point) *seg {
+	s := new(seg)
+	if p.x < q.x {
+		s.xmin = p.x
+		s.ymin = p.y
+		s.xmax = q.x
+		s.ymax = q.y
+	} else {
+		s.xmin = q.x
+		s.ymin = q.y
+		s.xmax = p.x
+		s.ymax = p.y
+	}
+	return s
 }
 
 func (s *Shapefile) dploysrv() {
@@ -55,6 +73,7 @@ func (p *polygon) insrv() {
 }
 
 func (p *polygon) mkindata() {
+	_ = p.mksegs()
 }
 
 func (p *polygon) inside(pt *point) bool {

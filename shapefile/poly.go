@@ -163,6 +163,20 @@ func (p *polygon) calc() {
 	p.cw = area < 0.
 }
 
+func (p *polygon) mksegs() []*seg {
+	c := p.count
+	ps := p.points
+	s := make([]*seg, c, c)
+	for i := 0; i < c; i++ {
+		j := i+1
+		if j == c {
+			j = 0
+		}
+		s[i] = mkseg(&ps[i], &ps[j])
+	}
+	return s
+}
+
 func (s *Shapefile) makeregions(p *polygons, i int) {
 	for _, q := range p.polys {
 		r := new(Region)
