@@ -7,6 +7,12 @@ type deployreq struct {
 
 type seg bbox
 
+type endpt struct {
+	x float64
+	s *seg
+	l bool
+}
+
 type indata struct {
 }
 
@@ -43,15 +49,11 @@ func (s *Shapefile) inside(p *polygon, t *point) bool {
 		return false
 	}
 	if p.inq == nil {
-		r := new(deployreq)
-		r.poly = p
-		r.resp = make(chan bool)
+		r := &deployreq{poly: p, resp: make(chan bool)}
 		s.deployq <- r
 		<-r.resp
 	}
-	r := new(inreq)
-	r.pt = t
-	r.resp = make(chan bool)
+	r := &inreq{pt: t, resp: make(chan bool)}
 	p.inq <- r
 	return <-r.resp
 }
@@ -73,7 +75,14 @@ func (p *polygon) insrv() {
 }
 
 func (p *polygon) mkindata() {
-	_ = p.mksegs()
+	segs := p.mksegs()
+	c := 2 * len(segs)
+	endpts := make([]*endpt, c, c)
+	for i, s := range segs {
+		x := 2 * i
+		endpts[x] = &endpt{x: s.xmin, s: s, l: true}
+		endpts[x+1] = &endpt{x: s.xmax, s: s, l: false}
+	}
 }
 
 func (p *polygon) inside(pt *point) bool {
