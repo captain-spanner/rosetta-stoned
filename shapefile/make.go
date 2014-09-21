@@ -25,11 +25,6 @@ type Shapefile struct {
 	err     string
 }
 
-type deployreq struct {
-	poly *polygon
-	resp chan bool
-}
-
 func MakeShapefile(n string, out io.Writer) (*Shapefile, error) {
 	sf := new(Shapefile)
 	sf.path = n

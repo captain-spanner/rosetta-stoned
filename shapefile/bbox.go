@@ -115,3 +115,7 @@ func (b *bbox) intersection(a *bbox) *bbox {
 	r.ymax = ymax
 	return r
 }
+
+func (b *bbox) enclosed(p *point) bool {
+	return p.x >= b.xmin && p.x <= b.xmax && p.y >= b.ymin && p.y <= b.ymax
+}

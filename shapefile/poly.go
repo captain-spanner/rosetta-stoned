@@ -17,6 +17,8 @@ type polygon struct {
 	cw     bool
 	count  int
 	points []point
+	inq    chan *inreq
+	ind    *indata
 }
 
 type Region struct {
@@ -203,5 +205,7 @@ func (s *Shapefile) analyze() error {
 		}
 		q.AddRegion(r)
 	}
+	s.deployq = make(chan *deployreq)
+	go s.dploysrv()
 	return nil
 }
