@@ -1,5 +1,9 @@
 package shapefile
 
+import (
+	"sort"
+)
+
 type deployreq struct {
 	poly *polygon
 	resp chan bool
@@ -74,6 +78,12 @@ func (p *polygon) insrv() {
 	}
 }
 
+type byX []*endpt
+
+func (a byX) Len() int           { return len(a) }
+func (a byX) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a byX) Less(i, j int) bool { return a[i].x < a[j].x }
+
 func (p *polygon) mkindata() {
 	segs := p.mksegs()
 	c := 2 * len(segs)
@@ -83,6 +93,7 @@ func (p *polygon) mkindata() {
 		endpts[x] = &endpt{x: s.xmin, s: s, l: true}
 		endpts[x+1] = &endpt{x: s.xmax, s: s, l: false}
 	}
+	sort.Sort(byX(endpts))
 }
 
 func (p *polygon) inside(pt *point) bool {
