@@ -9,14 +9,6 @@ type deployreq struct {
 	resp chan bool
 }
 
-type seg bbox
-
-type endpt struct {
-	x float64
-	s *seg
-	l bool
-}
-
 type indata struct {
 }
 
@@ -78,6 +70,25 @@ func (p *polygon) insrv() {
 	}
 }
 
+type seg bbox
+
+type endpt struct {
+	x float64
+	s *seg
+	l bool
+}
+
+type runx struct {
+	x float64
+	y []float64
+	e []*endpt
+}
+
+type run struct {
+	x float64
+	e []*endpt
+}
+
 type byX []*endpt
 
 func (a byX) Len() int           { return len(a) }
@@ -86,12 +97,12 @@ func (a byX) Less(i, j int) bool { return a[i].x < a[j].x }
 
 func (p *polygon) mkindata() {
 	segs := p.mksegs()
-	c := 2 * len(segs)
-	endpts := make([]*endpt, c, c)
-	for i, s := range segs {
-		x := 2 * i
-		endpts[x] = &endpt{x: s.xmin, s: s, l: true}
-		endpts[x+1] = &endpt{x: s.xmax, s: s, l: false}
+	endpts := make([]*endpt, 0)
+	for _, s := range segs {
+		if s.xmin != s.xmax {
+			endpts = append(endpts, &endpt{x: s.xmin, s: s, l: true})
+			endpts = append(endpts, &endpt{x: s.xmax, s: s, l: false})
+		}
 	}
 	sort.Sort(byX(endpts))
 }
