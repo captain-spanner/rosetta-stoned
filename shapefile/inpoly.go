@@ -30,6 +30,9 @@ func mkseg(p *point, q *point) *seg {
 		s.xmax = p.x
 		s.ymax = p.y
 	}
+	if s.xmin != s.xmax {
+		s.grad = (s.ymax - s.ymin) / (s.xmax - s.xmin)
+	}
 	return s
 }
 
@@ -70,7 +73,10 @@ func (p *polygon) insrv() {
 	}
 }
 
-type seg bbox
+type seg struct {
+	bbox
+	grad float64
+}
 
 type endpt struct {
 	x float64
