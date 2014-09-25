@@ -141,7 +141,13 @@ func mkrun(rx []*runx, x float64) *run {
 }
 
 func cull(rx []*runx, x float64) []*runx {
-	return nil
+	r := make([]*runx, 0)
+	for _, t := range rx {
+		if t.e.s.xmax != x {
+			r = append(r, t)
+		}
+	}
+	return r
 }
 
 func (p *polygon) inside(pt *point) bool {
