@@ -85,9 +85,8 @@ type endpt struct {
 }
 
 type runx struct {
-	x float64
-	y []float64
-	e []*endpt
+	y float64
+	e *endpt
 }
 
 type run struct {
@@ -111,6 +110,38 @@ func (p *polygon) mkindata() {
 		}
 	}
 	sort.Sort(byX(endpts))
+	scan(endpts)
+}
+
+func scan(es []*endpt) []*run {
+	// invariants:
+	//	r is array of completed runs
+	//		finalized at end of loop
+	//	x is current x
+	//		initialized when i == 0
+	//	rx is current list
+	x := 0.
+	r := make([]*run, 0)
+	rx := make([]*runx, 0)
+	for i, e := range es {
+		if i == 0 {
+			x = e.x
+		} else if x != e.x {
+			r = append(r, mkrun(rx, x))
+			rx = cull(rx, e.x)
+		}
+		rx = append(rx, &runx{e: e})
+	}
+	r = append(r, mkrun(rx, x))
+	return r
+}
+
+func mkrun(rx []*runx, x float64) *run {
+	return nil
+}
+
+func cull(rx []*runx, x float64) []*runx {
+	return nil
 }
 
 func (p *polygon) inside(pt *point) bool {
