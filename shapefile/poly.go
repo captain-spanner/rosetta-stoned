@@ -232,4 +232,9 @@ func (s *Shapefile) analyze() error {
 }
 
 func (s *Shapefile) populate() {
+	for _, p := range s.polys {
+		for _, q := range p.polys {
+			s.inside(q, &point{x: q.bounds.xmin, y: q.bounds.ymin})
+		}
+	}
 }
