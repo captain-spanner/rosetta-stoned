@@ -21,7 +21,6 @@ type polygon struct {
 	cw     bool
 	count  int
 	points []point
-	inq    chan *inreq
 	ind    *indata
 }
 
@@ -232,8 +231,9 @@ func (s *Shapefile) analyze() error {
 }
 
 func (s *Shapefile) populate() {
-	for _, p := range s.polys {
-		for _, q := range p.polys {
+	for i, p := range s.polys {
+		for j, q := range p.polys {
+			fmt.Printf("pop: (%d, %d)\n", i, j)
 			s.inside(q, &point{x: q.bounds.xmin, y: q.bounds.ymin})
 		}
 	}

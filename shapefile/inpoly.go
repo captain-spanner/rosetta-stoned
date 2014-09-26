@@ -10,11 +10,7 @@ type deployreq struct {
 }
 
 type indata struct {
-}
-
-type inreq struct {
-	pt   *point
-	resp chan bool
+	runs	[]*run
 }
 
 func mkseg(p *point, q *point) *seg {
@@ -47,30 +43,19 @@ func (s *Shapefile) inside(p *polygon, t *point) bool {
 	if !p.bounds.enclosed(t) {
 		return false
 	}
-	if p.inq == nil {
+	if p.ind == nil {
 		r := &deployreq{poly: p, resp: make(chan bool)}
 		s.deployq <- r
 		<-r.resp
 	}
-	r := &inreq{pt: t, resp: make(chan bool)}
-	p.inq <- r
-	return <-r.resp
+	return p.inside(t)
 }
 
 func (p *polygon) deploy() bool {
-	if p.inq == nil {
-		p.inq = make(chan *inreq)
-		go p.insrv()
+	if p.ind == nil {
+		p.mkindata()
 	}
 	return true
-}
-
-func (p *polygon) insrv() {
-	p.mkindata()
-	for {
-		r := <-p.inq
-		r.resp <- p.inside(r.pt)
-	}
 }
 
 type seg struct {
@@ -110,7 +95,7 @@ func (p *polygon) mkindata() {
 		}
 	}
 	sort.Sort(byX(endpts))
-	scan(endpts)
+	p.ind = &indata{runs: scan(endpts)}
 }
 
 func scan(es []*endpt) []*run {
@@ -129,6 +114,7 @@ func scan(es []*endpt) []*run {
 		} else if x != e.x {
 			r = append(r, mkrun(rx, x))
 			rx = cull(rx, e.x)
+			x = e.x
 		}
 		rx = append(rx, &runx{e: e})
 	}
