@@ -136,8 +136,33 @@ func scan(es []*endpt) []*run {
 	return r
 }
 
+func (s *seg) intercept(x float64) float64 {
+	return s.xmin + (x-s.xmin)*s.grad
+}
+
+type byYG []*runx
+
+func (a byYG) Len() int      { return len(a) }
+func (a byYG) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+
+func (a byYG) Less(i, j int) bool {
+	if a[i].y == a[j].y {
+		return a[i].e.s.grad < a[j].e.s.grad
+	} else {
+		return a[i].y < a[j].y
+	}
+}
+
 func mkrun(rx []*runx, x float64) *run {
-	return nil
+	for _, t := range rx {
+		t.y = t.e.s.intercept(x)
+	}
+	sort.Sort(byYG(rx))
+	e := make([]*endpt, 0)
+	for _, t := range rx {
+		e = append(e, t.e)
+	}
+	return &run{x: x, e: e}
 }
 
 func cull(rx []*runx, x float64) []*runx {
