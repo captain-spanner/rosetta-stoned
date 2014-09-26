@@ -5,6 +5,10 @@ import (
 	"io"
 )
 
+const (
+	rdebug = true
+)
+
 type polygons struct {
 	bounds bbox
 	holes  int
@@ -221,5 +225,11 @@ func (s *Shapefile) analyze() error {
 	}
 	s.deployq = make(chan *deployreq)
 	go s.dploysrv()
+	if rdebug {
+		s.populate()
+	}
 	return nil
+}
+
+func (s *Shapefile) populate() {
 }
