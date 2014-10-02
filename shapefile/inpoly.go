@@ -108,6 +108,9 @@ func scan(es []*endpt) []*run {
 	x := 0.
 	r := make([]*run, 0)
 	rx := make([]*runx, 0)
+	if rdebug2 {
+		rendpts += len(es)
+	}
 	for i, e := range es {
 		if i == 0 {
 			x = e.x
@@ -148,6 +151,15 @@ func mkrun(rx []*runx, x float64) *run {
 	for _, t := range rx {
 		e = append(e, t.e)
 	}
+	if rdebug2 {
+		l := len(e)
+		if l < rmin {
+			rmin = l
+		}
+		if l > rmax {
+			rmax = l
+		}
+	}
 	return &run{x: x, e: e}
 }
 
@@ -157,6 +169,9 @@ func cull(rx []*runx, x float64) []*runx {
 		if t.e.s.xmax != x {
 			r = append(r, t)
 		}
+	}
+	if rdebug2 {
+		rcull += len(rx) - len(r)
 	}
 	return r
 }

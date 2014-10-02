@@ -6,7 +6,16 @@ import (
 )
 
 const (
-	rdebug = true
+	rdebug  = true
+	rdebug2 = true
+	rkeep   = true
+)
+
+var (
+	rendpts int
+	rcull   int
+	rmin    int = 0
+	rmax    int = 16
 )
 
 type polygons struct {
@@ -171,7 +180,7 @@ func (p *polygon) mksegs() []*seg {
 	ps := p.points
 	s := make([]*seg, c, c)
 	for i := 0; i < c; i++ {
-		j := i+1
+		j := i + 1
 		if j == c {
 			j = 0
 		}
