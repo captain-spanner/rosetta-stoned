@@ -6,9 +6,8 @@ import (
 )
 
 const (
-	rdebug  = true
-	rdebug2 = true
-	rkeep   = true
+	rdebug  = false
+	rdebug2 = false
 )
 
 var (
@@ -235,6 +234,9 @@ func (s *Shapefile) analyze() error {
 	go s.dploysrv()
 	if rdebug {
 		s.populate()
+		if rdebug2 {
+			rstats()
+		}
 	}
 	return nil
 }
@@ -246,4 +248,11 @@ func (s *Shapefile) populate() {
 			s.inside(q, &point{x: q.bounds.xmin, y: q.bounds.ymin})
 		}
 	}
+}
+
+func rstats() {
+	fmt.Printf("rendpts: %d\n", rendpts)
+	fmt.Printf("rcull: %d\n", rcull)
+	fmt.Printf("rmin: %d\n", rmin)
+	fmt.Printf("rmax: %d\n", rmax)
 }

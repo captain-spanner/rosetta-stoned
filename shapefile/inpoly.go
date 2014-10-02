@@ -10,7 +10,7 @@ type deployreq struct {
 }
 
 type indata struct {
-	runs	[]*run
+	runs []*run
 }
 
 func mkseg(p *point, q *point) *seg {
@@ -119,7 +119,9 @@ func scan(es []*endpt) []*run {
 			rx = cull(rx, e.x)
 			x = e.x
 		}
-		rx = append(rx, &runx{e: e})
+		if e.l {
+			rx = append(rx, &runx{e: e})
+		}
 	}
 	r = append(r, mkrun(rx, x))
 	return r
