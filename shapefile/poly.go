@@ -8,6 +8,7 @@ import (
 const (
 	rdebug  = false
 	rdebug2 = false
+	rpop	= true
 )
 
 var (
@@ -232,8 +233,10 @@ func (s *Shapefile) analyze() error {
 	}
 	s.deployq = make(chan *deployreq)
 	go s.dploysrv()
-	if rdebug {
+	if rpop {
 		s.populate()
+	}
+	if rdebug {
 		if rdebug2 {
 			rstats()
 		}
@@ -244,7 +247,9 @@ func (s *Shapefile) analyze() error {
 func (s *Shapefile) populate() {
 	for i, p := range s.polys {
 		for j, q := range p.polys {
-			fmt.Printf("pop: (%d, %d)\n", i, j)
+			if rdebug {
+				fmt.Printf("pop: (%d, %d)\n", i, j)
+			}
 			s.inside(q, &point{x: q.bounds.xmin, y: q.bounds.ymin})
 		}
 	}
