@@ -18,6 +18,9 @@ type Quad struct {
 	full []*Region
 }
 
+type Qres interface {
+}
+
 type subreg struct {
 	depth int
 	box   bbox
@@ -25,8 +28,8 @@ type subreg struct {
 }
 
 const (
-	eps = 360.0 / float64(1 << 13)
-	eps2 = eps*eps
+	eps  = 360.0 / float64(1<<13)
+	eps2 = eps * eps
 )
 
 func MakeQuad(b *bbox) *Quad {
@@ -100,4 +103,20 @@ func (q *Quad) populate() {
 	for i := 0; i < 4; i++ {
 		q.down[i] = MakeQuad(q.qbox[i])
 	}
+}
+
+func (q *Quad) Search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
+	r := proc(q, pt)
+	if r != nil {
+		return r
+	}
+	if q.down == nil {
+		return nil
+	}
+	for i, b := range q.qbox {
+		if b.enclosed(pt) {
+			return q.down[i].Search(pt, proc)
+		}
+	}
+	return nil
 }
