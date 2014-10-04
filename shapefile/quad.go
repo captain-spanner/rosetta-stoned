@@ -104,19 +104,3 @@ func (q *Quad) populate() {
 		q.down[i] = MakeQuad(q.qbox[i])
 	}
 }
-
-func (q *Quad) Search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
-	r := proc(q, pt)
-	if r != nil {
-		return r
-	}
-	if q.down == nil {
-		return nil
-	}
-	for i, b := range q.qbox {
-		if b.enclosed(pt) {
-			return q.down[i].Search(pt, proc)
-		}
-	}
-	return nil
-}
