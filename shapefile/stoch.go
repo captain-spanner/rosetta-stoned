@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	epsz = 4
+	epsz = 8
 )
 
 type axdesc struct {
@@ -14,11 +14,11 @@ type axdesc struct {
 	vz float64
 }
 
-func (s *Shapefile) StochEps(n int) {
-	fmt.Println("StochEps:")
+func (s *Shapefile) StochEps(n int, seed int64) {
+	fmt.Printf("StochEps: count %d, seed %d\n", n, seed)
 	xd := mkAxdesc(s.box.xmin, s.box.xmax)
 	yd := mkAxdesc(s.box.ymin, s.box.ymax)
-	r := rand.New(rand.NewSource(666))
+	r := rand.New(rand.NewSource(seed))
 	e := make([]int, epsz+1, epsz+1)
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
@@ -28,6 +28,21 @@ func (s *Shapefile) StochEps(n int) {
 			e[c]++
 		} else {
 			e[epsz]++
+		}
+	}
+	for i, v := range e {
+		if v == 0 {
+			continue
+		}
+		switch i {
+		case 0:
+			fmt.Printf("Pirate land: %d (%d%%)\n", v, v*100/n)
+		case 1:
+			fmt.Printf("Claimed: %d\n", v)
+		case epsz:
+			fmt.Printf("Nutty: %d\n", v)
+		default:
+			fmt.Printf("Multi %d: %d\n", i, v)
 		}
 	}
 }
