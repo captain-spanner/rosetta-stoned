@@ -100,7 +100,11 @@ func (q *Quad) addsubreg(s *subreg) {
 }
 
 func (s *subreg) region(pt *point) int {
-	return -1
+	if s.reg.poly.inside(pt) {
+		return s.reg.i
+	} else {
+		return -1
+	}
 }
 
 func (q *Quad) populate() {

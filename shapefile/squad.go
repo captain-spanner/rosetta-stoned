@@ -4,7 +4,27 @@ type intwrap struct {
 	n int
 }
 
-func (q *Quad) Search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
+func (q *Quad) Search(pt *point) int {
+	r := q.searchFirst(pt)
+	if r == nil {
+		return -1
+	}
+	return r.Result()
+}
+
+func (q *Quad) SearchEps(pt *point) int {
+	r := q.searchEps(pt)
+	if r == nil {
+		return 0
+	}
+	return r.Result()
+}
+
+func (c *intwrap) Result() int {
+	return c.n
+}
+
+func (q *Quad) search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
 	r := proc(q, pt)
 	if r != nil {
 		return r
@@ -14,7 +34,7 @@ func (q *Quad) Search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
 	}
 	for i, b := range q.qbox {
 		if b.enclosed(pt) {
-			return q.down[i].Search(pt, proc)
+			return q.down[i].search(pt, proc)
 		}
 	}
 	return nil
@@ -51,17 +71,10 @@ func findfirst(q *Quad, pt *point) Qres {
 	return nil
 }
 
-func (c *intwrap) Result() int {
-	return c.n
-}
-func (q *Quad) searchEps(pt *point) Qres {
-	return q.Search(pt, findeps)
+func (q *Quad) searchFirst(pt *point) Qres {
+	return q.search(pt, findfirst)
 }
 
-func (q *Quad) SearchEps(pt *point) int {
-	r := q.searchEps(pt)
-	if r == nil {
-		return 0
-	}
-	return r.Result()
+func (q *Quad) searchEps(pt *point) Qres {
+	return q.search(pt, findeps)
 }
