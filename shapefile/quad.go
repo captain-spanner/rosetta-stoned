@@ -15,7 +15,7 @@ type Quad struct {
 	qbox []*bbox
 	down []*Quad
 	only *subreg
-	full []*Region
+	full []*subreg
 }
 
 type Qres interface {
@@ -29,8 +29,9 @@ type subreg struct {
 }
 
 const (
-	eps  = 360.0 / float64(1<<13)
-	eps2 = eps * eps
+	edepth = 13
+	eps    = 360.0 / float64(1<<edepth)
+	eps2   = eps * eps
 )
 
 func MakeQuad(b *bbox) *Quad {
@@ -78,9 +79,9 @@ func (q *Quad) addsubreg(s *subreg) {
 	}
 	if q.box.full(&s.box, eps2) {
 		if q.full == nil {
-			q.full = make([]*Region, 0)
+			q.full = make([]*subreg, 0)
 		}
-		q.full = append(q.full, s.reg)
+		q.full = append(q.full, s)
 		return
 	}
 	for i := 0; i < 4; i++ {
@@ -96,6 +97,10 @@ func (q *Quad) addsubreg(s *subreg) {
 			q.down[i].addsubreg(s.mksubreg(b))
 		}
 	}
+}
+
+func (s *subreg) region(pt *point) int {
+	return -1
 }
 
 func (q *Quad) populate() {

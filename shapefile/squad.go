@@ -1,6 +1,6 @@
 package shapefile
 
-type count struct {
+type intwrap struct {
 	n int
 }
 
@@ -20,6 +20,10 @@ func (q *Quad) Search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
 	return nil
 }
 
+func wrap(n int) Qres {
+	return Qres(&intwrap{n: n})
+}
+
 func findeps(q *Quad, pt *point) Qres {
 	n := 0
 	if q.only != nil {
@@ -30,10 +34,24 @@ func findeps(q *Quad, pt *point) Qres {
 	if n == 0 {
 		return nil
 	}
-	return Qres(&count{n: n})
+	return wrap(n)
 }
 
-func (c *count) Result() int {
+func findfirst(q *Quad, pt *point) Qres {
+	if q.only != nil {
+		return wrap(q.only.region(pt))
+	} else if q.full != nil {
+		for _, s := range q.full {
+			r := s.region(pt)
+			if r >= 0 {
+				return wrap(r)
+			}
+		}
+	}
+	return nil
+}
+
+func (c *intwrap) Result() int {
 	return c.n
 }
 func (q *Quad) searchEps(pt *point) Qres {
