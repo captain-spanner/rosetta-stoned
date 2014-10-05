@@ -34,6 +34,7 @@ type polygon struct {
 }
 
 type Region struct {
+	sf   *Shapefile
 	poly *polygon
 	i    int
 }
@@ -192,6 +193,7 @@ func (p *polygon) mksegs() []*seg {
 func (s *Shapefile) makeregions(p *polygons, i int) {
 	for _, q := range p.polys {
 		r := new(Region)
+		r.sf = s
 		r.poly = q
 		r.i = i
 		s.regs = append(s.regs, r)
