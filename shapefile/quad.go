@@ -19,6 +19,7 @@ type Quad struct {
 }
 
 type Qres interface {
+	Result() int
 }
 
 type subreg struct {

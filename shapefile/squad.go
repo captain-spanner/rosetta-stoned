@@ -33,6 +33,17 @@ func findeps(q *Quad, pt *point) Qres {
 	return Qres(&count{n: n})
 }
 
-func (q *Quad) SearchEps(pt *point) Qres {
+func (c *count) Result() int {
+	return c.n
+}
+func (q *Quad) searchEps(pt *point) Qres {
 	return q.Search(pt, findeps)
+}
+
+func (q *Quad) SearchEps(pt *point) int {
+	r := q.searchEps(pt)
+	if r == nil {
+		return 0
+	}
+	return r.Result()
 }
