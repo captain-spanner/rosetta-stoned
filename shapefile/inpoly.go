@@ -178,6 +178,14 @@ func cull(rx []*runx, x float64) []*runx {
 	return r
 }
 
+func (p *polygon) search(pt *point) int {
+	r := p.ind.runs
+	x := pt.x
+	i := sort.Search(len(r), func(i int) bool { return r[i].x >= x })
+	return i
+}
+
 func (p *polygon) inside(pt *point) bool {
+	p.search(pt)
 	return false
 }
