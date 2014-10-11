@@ -200,5 +200,19 @@ func (p *polygon) inside(pt *point) bool {
 }
 
 func (r *run) inside(pt *point) bool {
+	in := false
+	for _, e := range r.e {
+		y := e.s.intercept(pt.x)
+		if in {
+			if pt.y <= y {
+				return true
+			}
+		} else {
+			if pt.y < y {
+				return false
+			}
+		}
+		in = !in
+	}
 	return false
 }
