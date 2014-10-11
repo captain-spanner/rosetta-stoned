@@ -193,10 +193,10 @@ func (p *polygon) inside(pt *point) bool {
 	if r[i].inside(pt) {
 		return true
 	}
-	if pt.x != r[i].x || i == 0 {
-		return false
+	if pt.x == r[i].x && i != 0 {
+		return r[i-1].inside(pt)
 	}
-	return r[i-1].inside(pt)
+	return false
 }
 
 func (r *run) inside(pt *point) bool {
