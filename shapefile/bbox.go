@@ -37,18 +37,6 @@ func (b *bbox) inside(o *bbox) bool {
 	return b.xmin >= o.xmin && b.ymin >= o.ymin && b.xmax <= o.xmax && b.ymax <= o.ymax
 }
 
-func (b *bbox) pointin(pt *point) bool {
-	return pt.x >= b.xmin && pt.y >= b.ymin && pt.x <= b.xmax && pt.y <= b.ymax
-}
-
-func (b *bbox) pointins(pt *point) string {
-	if b.pointin(pt) {
-		return "yes"
-	} else {
-		return "no"
-	}
-}
-
 func (b *bbox) area() float64 {
 	return (b.xmax - b.xmin) * (b.ymax - b.ymin)
 }
@@ -130,4 +118,12 @@ func (b *bbox) intersection(a *bbox) *bbox {
 
 func (b *bbox) enclosed(p *point) bool {
 	return p.x >= b.xmin && p.x <= b.xmax && p.y >= b.ymin && p.y <= b.ymax
+}
+
+func (b *bbox) encloseds(pt *point) string {
+	if b.enclosed(pt) {
+		return "yes"
+	} else {
+		return "no"
+	}
 }
