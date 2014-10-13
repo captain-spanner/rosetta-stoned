@@ -39,6 +39,31 @@ func (s *Shapefile) Stoch(n int, seed int64) {
 	}
 }
 
+func (s *Shapefile) StochDebug(n int, seed int64) {
+	sz := len(s.regs)
+	xd, yd, r, e := s.mkdata("", sz, n, seed)
+	for i := 0; i < n; i++ {
+		x := xd.choose(r)
+		y := yd.choose(r)
+		c := s.quad.SearchDebug(&point{x: x, y: y})
+		if c < 0 {
+			e[sz]++
+		} else {
+			e[c]++
+		}
+	}
+	for i, v := range e {
+		if v == 0 {
+			continue
+		}
+		if i == sz {
+			fmt.Printf("Pirate land: %d (%d%%)\n", v, v*100/n)
+		} else {
+			fmt.Printf("Reg %d: %d\n", i, v)
+		}
+	}
+}
+
 func (s *Shapefile) StochEps(n int, seed int64) {
 	sz := epsz
 	xd, yd, r, e := s.mkdata("Eps", sz, n, seed)

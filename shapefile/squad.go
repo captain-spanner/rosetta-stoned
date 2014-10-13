@@ -99,9 +99,15 @@ func finddebug(q *Quad, pt *point) Qres {
 func findeps(q *Quad, pt *point) Qres {
 	n := 0
 	if q.only != nil {
-		n = 1
+		if q.only.box.enclosed(pt) {
+			n = 1
+		}
 	} else if q.full != nil {
-		n = len(q.full)
+		for _, s := range q.full {
+			if s.box.enclosed(pt) {
+				n++
+			}
+		}
 	}
 	if n == 0 {
 		return nil
