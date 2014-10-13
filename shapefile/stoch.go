@@ -15,12 +15,8 @@ type axdesc struct {
 }
 
 func (s *Shapefile) Stoch(n int, seed int64) {
-	fmt.Printf("Stoch: count %d, seed %d\n", n, seed)
-	xd := mkAxdesc(s.box.xmin, s.box.xmax)
-	yd := mkAxdesc(s.box.ymin, s.box.ymax)
-	r := rand.New(rand.NewSource(seed))
 	sz := len(s.regs)
-	e := make([]int, sz+1, sz+1)
+	xd, yd, r, e := s.mkdata("", sz, n, seed)
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
 		y := yd.choose(r)
@@ -44,12 +40,8 @@ func (s *Shapefile) Stoch(n int, seed int64) {
 }
 
 func (s *Shapefile) StochEps(n int, seed int64) {
-	fmt.Printf("StochEps: count %d, seed %d\n", n, seed)
-	xd := mkAxdesc(s.box.xmin, s.box.xmax)
-	yd := mkAxdesc(s.box.ymin, s.box.ymax)
-	r := rand.New(rand.NewSource(seed))
 	sz := epsz
-	e := make([]int, sz+1, sz+1)
+	xd, yd, r, e := s.mkdata("Eps", sz, n, seed)
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
 		y := yd.choose(r)
@@ -75,6 +67,15 @@ func (s *Shapefile) StochEps(n int, seed int64) {
 			fmt.Printf("Multi %d: %d\n", i, v)
 		}
 	}
+}
+
+func (s *Shapefile) mkdata(t string, z int, n int, seed int64) (*axdesc, *axdesc, *rand.Rand, []int) {
+	fmt.Printf("Stoch%s: count %d, seed %d\n", t, n, seed)
+	xd := mkAxdesc(s.box.xmin, s.box.xmax)
+	yd := mkAxdesc(s.box.ymin, s.box.ymax)
+	r := rand.New(rand.NewSource(seed))
+	e := make([]int, z+1, z+1)
+	return xd, yd, r, e
 }
 
 func mkAxdesc(min, max float64) *axdesc {

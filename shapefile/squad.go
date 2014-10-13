@@ -1,5 +1,10 @@
 package shapefile
 
+import (
+	"fmt"
+	"os"
+)
+
 type intwrap struct {
 	n int
 }
@@ -42,6 +47,38 @@ func (q *Quad) search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
 
 func wrap(n int) Qres {
 	return Qres(&intwrap{n: n})
+}
+
+func finddebug(q *Quad, pt *point) Qres {
+	fmt.Print("find ")
+	pt.print()
+	qa := q.box.area()
+	fmt.Printf("area %f\nbox: ", qa)
+	q.box.print(os.Stdout)
+	if q.only != nil {
+		a := q.only.box.area()
+		fmt.Printf("only %f (%f%%)\nbox: ", a, 100.*a/qa)
+		q.only.box.print(os.Stdout)
+		x := q.only.region(pt)
+		if x < 0 {
+			fmt.Println("pirate")
+		}
+		return wrap(x)
+	} else if q.full != nil {
+		fmt.Println("full")
+		for i, s := range q.full {
+			a := s.box.area()
+			fmt.Printf("%d: %f (%f%%)\nbox: ", i, a, 100.*a/qa)
+			s.box.print(os.Stdout)
+			r := s.region(pt)
+			if r >= 0 {
+				return wrap(r)
+			}
+			fmt.Println("pirate")
+		}
+	}
+	fmt.Println("down")
+	return nil
 }
 
 func findeps(q *Quad, pt *point) Qres {

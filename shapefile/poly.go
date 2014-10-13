@@ -257,6 +257,10 @@ func (s *Shapefile) populate() {
 	}
 }
 
+func (pt *point) print() {
+	fmt.Printf("pt(%f %f)\n", pt.x, pt.y)
+}
+
 func rstats() {
 	fmt.Printf("rendpts: %d\n", rendpts)
 	fmt.Printf("rcull: %d\n", rcull)
