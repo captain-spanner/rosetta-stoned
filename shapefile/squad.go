@@ -17,6 +17,14 @@ func (q *Quad) Search(pt *point) int {
 	return r.Result()
 }
 
+func (q *Quad) SearchDebug(pt *point) int {
+	r := q.searchDebug(pt)
+	if r == nil {
+		return -1
+	}
+	return r.Result()
+}
+
 func (q *Quad) SearchEps(pt *point) int {
 	r := q.searchEps(pt)
 	if r == nil {
@@ -64,6 +72,8 @@ func finddebug(q *Quad, pt *point) Qres {
 		x := q.only.region(pt)
 		if x < 0 {
 			fmt.Println("pirate")
+		} else {
+			fmt.Printf("Region %d\n", x)
 		}
 		return wrap(x)
 	} else if q.full != nil {
@@ -74,10 +84,12 @@ func finddebug(q *Quad, pt *point) Qres {
 			s.box.print(os.Stdout)
 			fmt.Println("in %s\n", s.box.encloseds(pt))
 			r := s.region(pt)
-			if r >= 0 {
+			if r < 0 {
+				fmt.Println("pirate")
+			} else {
+				fmt.Printf("Region %d\n", r)
 				return wrap(r)
 			}
-			fmt.Println("pirate")
 		}
 	}
 	fmt.Println("down")
@@ -109,6 +121,10 @@ func findfirst(q *Quad, pt *point) Qres {
 		}
 	}
 	return nil
+}
+
+func (q *Quad) searchDebug(pt *point) Qres {
+	return q.search(pt, finddebug)
 }
 
 func (q *Quad) searchFirst(pt *point) Qres {
