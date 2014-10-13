@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+const (
+	idebug = true
+)
+
 type intwrap struct {
 	n int
 }
@@ -63,12 +67,12 @@ func finddebug(q *Quad, pt *point) Qres {
 	qa := q.box.area()
 	fmt.Printf("area %f\nbox: ", qa)
 	q.box.print(os.Stdout)
-	fmt.Println("in %s\n", q.box.encloseds(pt))
+	fmt.Printf("in %s\n", q.box.encloseds(pt))
 	if q.only != nil {
 		a := q.only.box.area()
 		fmt.Printf("only %f (%f%%)\nbox: ", a, 100.*a/qa)
 		q.only.box.print(os.Stdout)
-		fmt.Println("in %s\n", q.only.box.encloseds(pt))
+		fmt.Printf("in %s\n", q.only.box.encloseds(pt))
 		x := q.only.region(pt)
 		if x < 0 {
 			fmt.Println("pirate")
@@ -82,7 +86,7 @@ func finddebug(q *Quad, pt *point) Qres {
 			a := s.box.area()
 			fmt.Printf("%d: %f (%f%%)\nbox: ", i, a, 100.*a/qa)
 			s.box.print(os.Stdout)
-			fmt.Println("in %s\n", s.box.encloseds(pt))
+			fmt.Printf("in %s\n", s.box.encloseds(pt))
 			r := s.region(pt)
 			if r < 0 {
 				fmt.Println("pirate")

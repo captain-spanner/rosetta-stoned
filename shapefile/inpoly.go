@@ -1,6 +1,7 @@
 package shapefile
 
 import (
+	"fmt"
 	"sort"
 )
 
@@ -41,6 +42,9 @@ func (s *Shapefile) dploysrv() {
 
 func (s *Shapefile) inside(p *polygon, t *point) bool {
 	if !p.bounds.enclosed(t) {
+		if idebug {
+			fmt.Println("what, not enclosed?")
+		}
 		return false
 	}
 	if p.ind == nil {
@@ -187,19 +191,35 @@ func (p *polygon) search(pt *point) int {
 func (p *polygon) inside(pt *point) bool {
 	i := p.search(pt)
 	if i < 0 {
+		if idebug {
+			fmt.Println("search failed")
+		}
 		return false
 	}
 	r := p.ind.runs
+	if idebug {
+		fmt.Printf("index %d %f ", i, r[i].x)
+	}
 	if r[i].inside(pt) {
 		return true
 	}
 	if pt.x == r[i].x && i != 0 {
+		if idebug {
+			fmt.Print("check lower ")
+		}
 		return r[i-1].inside(pt)
 	}
 	return false
 }
 
 func (r *run) inside(pt *point) bool {
+	if idebug {
+		ys := make([]float64, len(r.e), len(r.e))
+		for i, e := range r.e {
+			ys[i] = e.s.intercept(pt.x)
+		}
+		fmt.Println(ys)
+	}
 	in := false
 	for _, e := range r.e {
 		y := e.s.intercept(pt.x)

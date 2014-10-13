@@ -62,6 +62,7 @@ func (s *Shapefile) StochDebug(n int, seed int64) {
 			fmt.Printf("Reg %d: %d\n", i, v)
 		}
 	}
+	fmt.Println("=========")
 }
 
 func (s *Shapefile) StochEps(n int, seed int64) {
