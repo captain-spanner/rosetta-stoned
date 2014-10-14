@@ -30,7 +30,7 @@ func (b *bbox) prints(out io.Writer, s string) {
 }
 
 func (b *bbox) full(o *bbox, eps2 float64) bool {
-	return b.area() - o.area() <= eps2
+	return b.area()-o.area() <= eps2
 }
 
 func (b *bbox) inside(o *bbox) bool {
@@ -80,7 +80,7 @@ func (b *bbox) divide() []*bbox {
 		if Qdebug2 {
 			n.print(os.Stdout)
 		}
-	}                   
+	}
 	return d
 }
 
