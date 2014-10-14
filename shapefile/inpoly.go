@@ -74,7 +74,7 @@ type endpt struct {
 }
 
 type runx struct {
-	y float64
+	x float64
 	e *endpt
 }
 
@@ -131,28 +131,28 @@ func scan(es []*endpt) []*run {
 	return r
 }
 
-func (s *seg) intercept(x float64) float64 {
+func (s *seg) xintercept(x float64) float64 {
 	return s.xmin + (x-s.xmin)*s.grad
 }
 
-type byYG []*runx
+type byXG []*runx
 
-func (a byYG) Len() int      { return len(a) }
-func (a byYG) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
+func (a byXG) Len() int      { return len(a) }
+func (a byXG) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-func (a byYG) Less(i, j int) bool {
-	if a[i].y == a[j].y {
+func (a byXG) Less(i, j int) bool {
+	if a[i].x == a[j].x {
 		return a[i].e.s.grad < a[j].e.s.grad
 	} else {
-		return a[i].y < a[j].y
+		return a[i].x < a[j].x
 	}
 }
 
 func mkrun(rx []*runx, x float64) *run {
 	for _, t := range rx {
-		t.y = t.e.s.intercept(x)
+		t.x = t.e.s.xintercept(x)
 	}
-	sort.Sort(byYG(rx))
+	sort.Sort(byXG(rx))
 	e := make([]*endpt, 0)
 	for _, t := range rx {
 		e = append(e, t.e)
@@ -217,13 +217,13 @@ func (r *run) inside(pt *point) bool {
 		pt.print()
 		xs := make([]float64, len(r.e), len(r.e))
 		for i, e := range r.e {
-			xs[i] = e.s.intercept(pt.x)
+			xs[i] = e.s.xintercept(pt.x)
 		}
 		fmt.Println(xs)
 	}
 	in := false
 	for i, e := range r.e {
-		x := e.s.intercept(pt.x)
+		x := e.s.xintercept(pt.x)
 		if idebug {
 			fmt.Printf("e[%d] = %f\n", i, x)
 		}
