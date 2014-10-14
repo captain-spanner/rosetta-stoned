@@ -214,25 +214,44 @@ func (p *polygon) inside(pt *point) bool {
 
 func (r *run) inside(pt *point) bool {
 	if idebug {
-		ys := make([]float64, len(r.e), len(r.e))
+		pt.print()
+		xs := make([]float64, len(r.e), len(r.e))
 		for i, e := range r.e {
-			ys[i] = e.s.intercept(pt.x)
+			xs[i] = e.s.intercept(pt.x)
 		}
-		fmt.Println(ys)
+		fmt.Println(xs)
 	}
 	in := false
-	for _, e := range r.e {
-		y := e.s.intercept(pt.x)
+	for i, e := range r.e {
+		x := e.s.intercept(pt.x)
+		if idebug {
+			fmt.Printf("e[%d] = %f\n", i, x)
+		}
 		if in {
-			if pt.y <= y {
+			if idebug {
+				fmt.Printf("in %f %f\n", pt.x, x)
+			}
+			if pt.x <= x {
+				if idebug {
+					fmt.Println("IN")
+				}
 				return true
 			}
 		} else {
-			if pt.y < y {
+			if idebug {
+				fmt.Printf("out %f %f\n", pt.x, x)
+			}
+			if pt.x < x {
+				if idebug {
+					fmt.Println("OUT")
+				}
 				return false
 			}
 		}
 		in = !in
+	}
+	if idebug {
+		fmt.Printf("end in %t\n", in)
 	}
 	return false
 }
