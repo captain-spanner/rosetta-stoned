@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"sort"
 )
@@ -58,24 +57,11 @@ func MakeFsrec(n string, rs int, ks int) (*Fsrec, error) {
 	return fr, nil
 }
 
-func (fs *Fsrec) Search(k []byte) []byte {
+func (fs *Fsrec) Search(k []byte) int {
 	n := sort.Search(fs.nrecs, func(i int) bool { return fs.geq(i, k) })
-	if n < 0 {
-		return nil
-	}
-	return fs.getrec(n)
+	return n
 }
 
 func (fs *Fsrec) geq(n int, k []byte) bool {
-	return bytes.Compare(fs.getrec(n)[:fs.keysz], k) >= 0
-}
-
-func (fs *Fsrec) getrec(n int) []byte {
-	z := fs.recsz
-	b := make([]byte, z, z)
-	n, err := fs.file.ReadAt(b, int64(n*z))
-	if err != nil {
-		log.Fatal(err)
-	}
-	return b
+	return bytes.Compare(fs.GetRec(n)[:fs.keysz], k) >= 0
 }
