@@ -3,12 +3,14 @@ package shapefile
 import (
 	"fmt"
 	"io"
+	"os"
 )
 
 const (
 	rdebug  = false
 	rdebug2 = false
 	rpop    = false
+	rbounds = false
 )
 
 var (
@@ -224,6 +226,9 @@ func (s *Shapefile) analyze() error {
 		if s.err != "" {
 			return s
 		}
+	}
+	if rbounds {
+		s.box.print(os.Stdout)
 	}
 	q := MakeQuad(&s.box)
 	s.quad = q
