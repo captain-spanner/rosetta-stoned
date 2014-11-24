@@ -14,7 +14,7 @@ func (s *Shapefile) Process() {
 		if r != 2 || err != nil {
 			break
 		}
-		c := s.quad.Search(&Point{x: x, y: y})
+		c := s.Where(&Point{x: x, y: y})
 		if c < 0 {
 			e[sz]++
 		} else {
