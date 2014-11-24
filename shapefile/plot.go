@@ -32,7 +32,7 @@ func (p *polygon) print(f *os.File) {
 		if i != 0 {
 			fmt.Fprint(f, " ")
 		}
-		fmt.Fprintf(f, "%f %f", p.points[i].x, p.points[i].y)
+		fmt.Fprintf(f, "%f %f", p.Points[i].x, p.Points[i].y)
 	}
 	fmt.Fprint(f, "}")
 }

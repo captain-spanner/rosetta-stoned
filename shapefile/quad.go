@@ -99,7 +99,7 @@ func (q *Quad) addsubreg(s *subreg) {
 	}
 }
 
-func (s *subreg) region(pt *point) int {
+func (s *subreg) region(pt *Point) int {
 	if s.reg.sf.inside(s.reg.poly, pt) {
 		return s.reg.i
 	} else {

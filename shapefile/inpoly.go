@@ -14,7 +14,7 @@ type indata struct {
 	runs []*run
 }
 
-func mkseg(p *point, q *point) *seg {
+func mkseg(p *Point, q *Point) *seg {
 	s := new(seg)
 	if p.x < q.x {
 		s.xmin = p.x
@@ -40,7 +40,7 @@ func (s *Shapefile) dploysrv() {
 	}
 }
 
-func (s *Shapefile) inside(p *polygon, t *point) bool {
+func (s *Shapefile) inside(p *polygon, t *Point) bool {
 	if !p.bounds.enclosed(t) {
 		if idebug {
 			fmt.Println("what, not enclosed?")
@@ -182,13 +182,13 @@ func cull(rx []*runx, x float64) []*runx {
 	return r
 }
 
-func (p *polygon) search(pt *point) int {
+func (p *polygon) search(pt *Point) int {
 	r := p.ind.runs
 	x := pt.x
 	return sort.Search(len(r), func(i int) bool { return r[i].x >= x })
 }
 
-func (p *polygon) inside(pt *point) bool {
+func (p *polygon) inside(pt *Point) bool {
 	i := p.search(pt)
 	if i < 0 {
 		if idebug {
@@ -212,7 +212,7 @@ func (p *polygon) inside(pt *point) bool {
 	return false
 }
 
-func (r *run) inside(pt *point) bool {
+func (r *run) inside(pt *Point) bool {
 	if idebug {
 		pt.print()
 		xs := make([]float64, len(r.e), len(r.e))

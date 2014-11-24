@@ -116,11 +116,11 @@ func (b *bbox) intersection(a *bbox) *bbox {
 	return r
 }
 
-func (b *bbox) enclosed(p *point) bool {
+func (b *bbox) enclosed(p *Point) bool {
 	return p.x >= b.xmin && p.x <= b.xmax && p.y >= b.ymin && p.y <= b.ymax
 }
 
-func (b *bbox) encloseds(pt *point) string {
+func (b *bbox) encloseds(pt *Point) string {
 	if b.enclosed(pt) {
 		return "yes"
 	} else {

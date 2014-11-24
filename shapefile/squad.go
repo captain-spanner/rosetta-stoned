@@ -13,7 +13,7 @@ type intwrap struct {
 	n int
 }
 
-func (q *Quad) Search(pt *point) int {
+func (q *Quad) Search(pt *Point) int {
 	r := q.searchFirst(pt)
 	if r == nil {
 		return -1
@@ -21,7 +21,7 @@ func (q *Quad) Search(pt *point) int {
 	return r.Result()
 }
 
-func (q *Quad) SearchDebug(pt *point) int {
+func (q *Quad) SearchDebug(pt *Point) int {
 	r := q.searchDebug(pt)
 	if r == nil {
 		return -1
@@ -29,7 +29,7 @@ func (q *Quad) SearchDebug(pt *point) int {
 	return r.Result()
 }
 
-func (q *Quad) SearchEps(pt *point) int {
+func (q *Quad) SearchEps(pt *Point) int {
 	r := q.searchEps(pt)
 	if r == nil {
 		return 0
@@ -41,7 +41,7 @@ func (c *intwrap) Result() int {
 	return c.n
 }
 
-func (q *Quad) search(pt *point, proc func(q *Quad, pt *point) Qres) Qres {
+func (q *Quad) search(pt *Point, proc func(q *Quad, pt *Point) Qres) Qres {
 	r := proc(q, pt)
 	if r != nil {
 		return r
@@ -61,7 +61,7 @@ func wrap(n int) Qres {
 	return Qres(&intwrap{n: n})
 }
 
-func finddebug(q *Quad, pt *point) Qres {
+func finddebug(q *Quad, pt *Point) Qres {
 	fmt.Print("find ")
 	pt.print()
 	qa := q.box.area()
@@ -100,7 +100,7 @@ func finddebug(q *Quad, pt *point) Qres {
 	return nil
 }
 
-func findeps(q *Quad, pt *point) Qres {
+func findeps(q *Quad, pt *Point) Qres {
 	n := 0
 	if q.only != nil {
 		if q.only.box.enclosed(pt) {
@@ -119,7 +119,7 @@ func findeps(q *Quad, pt *point) Qres {
 	return wrap(n)
 }
 
-func findfirst(q *Quad, pt *point) Qres {
+func findfirst(q *Quad, pt *Point) Qres {
 	if q.only != nil {
 		return wrap(q.only.region(pt))
 	} else if q.full != nil {
@@ -133,14 +133,14 @@ func findfirst(q *Quad, pt *point) Qres {
 	return nil
 }
 
-func (q *Quad) searchDebug(pt *point) Qres {
+func (q *Quad) searchDebug(pt *Point) Qres {
 	return q.search(pt, finddebug)
 }
 
-func (q *Quad) searchFirst(pt *point) Qres {
+func (q *Quad) searchFirst(pt *Point) Qres {
 	return q.search(pt, findfirst)
 }
 
-func (q *Quad) searchEps(pt *point) Qres {
+func (q *Quad) searchEps(pt *Point) Qres {
 	return q.search(pt, findeps)
 }

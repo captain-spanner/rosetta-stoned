@@ -31,7 +31,7 @@ type polygon struct {
 	bounds bbox
 	cw     bool
 	count  int
-	points []point
+	Points []Point
 	ind    *indata
 }
 
@@ -41,7 +41,7 @@ type Region struct {
 	i    int
 }
 
-type point struct {
+type Point struct {
 	x float64
 	y float64
 }
@@ -117,12 +117,12 @@ func makepolys(b []byte) *polygons {
 		c := o[i+1] - o[i]
 		g := new(polygon)
 		g.count = c
-		ps := make([]point, c, c)
+		ps := make([]Point, c, c)
 		for j := 0; j < c; j++ {
-			makepoint(b[po:], &ps[j])
+			makePoint(b[po:], &ps[j])
 			po += 16
 		}
-		g.points = ps
+		g.Points = ps
 		g.calc()
 		v[i] = g
 		if !g.cw {
@@ -133,14 +133,14 @@ func makepolys(b []byte) *polygons {
 	return p
 }
 
-func makepoint(b []byte, p *point) {
+func makePoint(b []byte, p *Point) {
 	p.x = fl64(b[0:])
 	p.y = fl64(b[8:])
 }
 
 func (p *polygon) calc() {
 	c := p.count
-	ps := p.points
+	ps := p.Points
 	xmin := 360.
 	ymin := 360.
 	xmax := -360.
@@ -180,7 +180,7 @@ func (p *polygon) calc() {
 
 func (p *polygon) mksegs() []*seg {
 	c := p.count
-	ps := p.points
+	ps := p.Points
 	s := make([]*seg, c, c)
 	for i := 0; i < c; i++ {
 		j := i + 1
@@ -257,12 +257,12 @@ func (s *Shapefile) populate() {
 			if rdebug {
 				fmt.Printf("pop: (%d, %d)\n", i, j)
 			}
-			s.inside(q, &point{x: q.bounds.xmin, y: q.bounds.ymin})
+			s.inside(q, &Point{x: q.bounds.xmin, y: q.bounds.ymin})
 		}
 	}
 }
 
-func (pt *point) print() {
+func (pt *Point) print() {
 	fmt.Printf("pt(%f %f)\n", pt.x, pt.y)
 }
 

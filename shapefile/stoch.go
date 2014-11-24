@@ -20,7 +20,7 @@ func (s *Shapefile) Stoch(n int, seed int64) {
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
 		y := yd.choose(r)
-		c := s.quad.Search(&point{x: x, y: y})
+		c := s.Where(&Point{x: x, y: y})
 		if c < 0 {
 			e[sz]++
 		} else {
@@ -45,7 +45,7 @@ func (s *Shapefile) StochDebug(n int, seed int64) {
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
 		y := yd.choose(r)
-		c := s.quad.SearchDebug(&point{x: x, y: y})
+		c := s.Where(&Point{x: x, y: y})
 		if c < 0 {
 			e[sz]++
 		} else {
@@ -71,7 +71,7 @@ func (s *Shapefile) StochEps(n int, seed int64) {
 	for i := 0; i < n; i++ {
 		x := xd.choose(r)
 		y := yd.choose(r)
-		c := s.quad.SearchEps(&point{x: x, y: y})
+		c := s.Where(&Point{x: x, y: y})
 		if c < sz {
 			e[c]++
 		} else {
