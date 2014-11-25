@@ -201,14 +201,14 @@ func cmd_regions(argc int, args []string, rose *Petal) ([]string, int) {
 		return strv(m), 1
 	}
 	regions = args[0]
-	m := checkdir(regions)
-	if m != "" {
-		fatal(regions, 0, m)
-	}
 	if rose.message {
 		fmt.Fprintf(rose.wr, "regions = %q\n", regions)
 	}
 	glob_set("regions", regions)
+	m := loadsf()
+	if m != "" {
+		fatal(regions, 0, m)
+	}
 	return none, 0
 }
 

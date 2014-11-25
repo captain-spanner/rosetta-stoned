@@ -2,6 +2,7 @@ package rose
 
 import (
 	"fmt"
+	"shapefile"
 )
 
 const (
@@ -190,6 +191,7 @@ Vdom	;	Domain of synset
 var (
 	root	string
 	regions	string
+	regfile *shapefile.Shapefile
 	fine	chan bool = make(chan bool)
 
 	server bool		= false
