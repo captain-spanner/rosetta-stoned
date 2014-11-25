@@ -195,6 +195,23 @@ func cmd_pop(argc int, args []string, rose *Petal) ([]string, int) {
 	return v, e
 }
 
+func cmd_regions(argc int, args []string, rose *Petal) ([]string, int) {
+	if regions != "" {
+		m := "regions already set"
+		return strv(m), 1
+	}
+	regions = args[0]
+	m := checkdir(regions)
+	if m != "" {
+		fatal(regions, 0, m)
+	}
+	if rose.message {
+		fmt.Fprintf(rose.wr, "regions = %q\n", regions)
+	}
+	glob_set("regions", regions)
+	return none, 0
+}
+
 func cmd_root(argc int, args []string, rose *Petal) ([]string, int) {
 	if root != "" {
 		m := "root already set"

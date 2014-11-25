@@ -189,6 +189,7 @@ Vdom	;	Domain of synset
 
 var (
 	root	string
+	regions	string
 	fine	chan bool = make(chan bool)
 
 	server bool		= false
