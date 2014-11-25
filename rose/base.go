@@ -198,7 +198,7 @@ var (
 
 	hashes map[hashc]string	= map[hashc]string {
 		hError:		"error",
-		hFsRec:		"File",
+		hFsRec:		"fsrec",
 		hHashed:	"hashed",
 		hIndexed:	"indexed",
 		hLiteral:	"literal",

@@ -62,12 +62,12 @@ func (ix *index) print_index() string {
 	if ix.words != nil {
 		w = fmt.Sprintf("%d", len(ix.words))
 	}
-	return fmt.Sprintf("%8d%10s%5d%6t%7s  %s",
+	return fmt.Sprintf("%9d%9s%5d%6t%8s  %s",
 		ix.count, hashes[ix.hash], ix.arg, ix.ok, w, ix.name)
 }
 
 func (rose *Petal) print_header() {
-	fmt.Fprintf(rose.wr, "%8s%10s%5s%6s%7s  %s\n",
+	fmt.Fprintf(rose.wr, "%9s%9s%5s%6s%8s  %s\n",
 		"Count", "Encoding", "Arg", "Ready", "Words", "Name")
 }
 
