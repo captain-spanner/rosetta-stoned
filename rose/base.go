@@ -12,6 +12,7 @@ const (
 
 const (
 	hError		= hashc(iota)
+	hFsRec
 	hHashed
 	hIndexed
 	hLiteral
@@ -197,6 +198,7 @@ var (
 
 	hashes map[hashc]string	= map[hashc]string {
 		hError:		"error",
+		hFsRec:		"File",
 		hHashed:	"hashed",
 		hIndexed:	"indexed",
 		hLiteral:	"literal",

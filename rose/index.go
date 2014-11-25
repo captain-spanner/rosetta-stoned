@@ -113,6 +113,8 @@ func (ix *index) decode_fmt() bool {
 		return false
 	}
 	switch v[0] {
+	case "fsrec":
+		ix.hash = hFsRec
 	case "hash":
 		ix.hash = hHashed
 	case "literal":
@@ -178,7 +180,7 @@ func make_index(s string, rose *Petal) (int, string) {
 	if !b || ix.count == 0 || ix.arg == 0 {
 		ix.ok = false
 	}
-	if ix.ok {
+	if ix.ok && ix.hash != hFsRec {
 		b, err := readpbytes(p, "«map»")
 		if err != "" {
 			ix.ok = false

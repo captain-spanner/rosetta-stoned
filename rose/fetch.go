@@ -5,10 +5,11 @@ import (
 )
 
 var (
-	fetchtv	[]fetchf = []fetchf {
-		hHashed:	fetch_hashed,
-		hIndexed:	fetch_indexed,
-		hLiteral:	fetch_literal,
+	fetchtv []fetchf = []fetchf{
+		hFsRec:    fetch_null,
+		hHashed:  fetch_hashed,
+		hIndexed: fetch_indexed,
+		hLiteral: fetch_literal,
 	}
 )
 
@@ -63,6 +64,10 @@ func fetch_string(ix *index, s string, h uint32) []byte {
 	return fetchtv[ix.hash](ix, s, h)
 }
 
+func fetch_null(ix *index, s string, h uint32) []byte {
+	return nil
+}
+
 func fetch_literal(ix *index, s string, h uint32) []byte {
 	return fetch_file(ix.path, s)
 }
@@ -84,7 +89,7 @@ func fetch_indexed(ix *index, s string, h uint32) []byte {
 }
 
 func fetch_hashed(ix *index, s string, h uint32) []byte {
-	x := fmt.Sprintf("%02X", h % uint32(ix.arg))
+	x := fmt.Sprintf("%02X", h%uint32(ix.arg))
 	p := ix.path + "/" + x
 	return fetch_file(p, s)
 }
