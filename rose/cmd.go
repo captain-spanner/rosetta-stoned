@@ -39,6 +39,7 @@ func init_cmds() {
 		"index":	{ cmd_index, 0, 1, "index [ <name> ]", "manage indexes" },
 		"interactive":	{ cmd_interactive, 0, 1, "interactive [ <bool> ]", "manage interactive" },
 		"lookup":	{ cmd_lookup, 1, 2, "lookup <word> [ <option> ]", "lookup word is base corpus" },
+		"map":		{ cmd_map, 1, 1, "map <index>", "set coord map" },
 		"message":	{ cmd_message, 0, 1, "message [ <bool> ]", "manage message" },
 		"part":		{ cmd_part, 2, 2, "part <index> <word>", "get part of speach" },
 		"pop":		{ cmd_pop, 2, 3, "pop <index> <word> [ <depth> ]", "populate part of speach" },

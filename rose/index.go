@@ -29,6 +29,7 @@ type part interface {
 
 type index struct {
 	name	string
+	file	string
 	path	string
 	count	int
 	date	string
@@ -144,13 +145,14 @@ func read_words(p string) map[string]bool {
 	return m
 }
 
-func make_index(s string, rose *Petal) (int, string) {
+func make_index(s string, f string, rose *Petal) (int, string) {
 	if indexm[s] != nil {
 		return 0, ""
 	}
 	ix := new(index)
 	ix.ok = true
 	ix.name = s
+	ix.file = f
 	p := root + "/" + s
 	m := checkdir(p)
 	if m != "" {
@@ -196,23 +198,6 @@ func make_index(s string, rose *Petal) (int, string) {
 	return 0, ""
 }
 
-type corpus struct {
-	name	string
-	parts	[]*index
-	pcaches	*pcache
-}
-
-func addcorsrv() {
-	for {
-		c := <- addcorq
-		if corpn[c.name] != nil {
-			continue
-		}
-		corpi = append(corpi, c)
-		corpn[c.name] = c
-	}
-}
-
 func (rose *Petal) set_base(s string) {
 	c := corpn[s]
 	if c == nil {
@@ -242,7 +227,7 @@ func (rose *Petal) make_corpus(s string) (int, string) {
 			continue
 		}
 		p := s + "/" + f
-		e, m := make_index(p, rose)
+		e, m := make_index(p, f, rose)
 		if message && m != "" {
 			fmt.Fprintf(rose.wr, "%s: %s\n", p, m)
 		}
@@ -294,7 +279,7 @@ func make_collection(s string, rose *Petal) (int, string) {
 	}
 	for _, f := range l {
 		p := s + "/" + f
-		e, m := make_index(p, rose)
+		e, m := make_index(p, f, rose)
 		if m != "" {
 			return e, m
 		}

@@ -125,7 +125,7 @@ func cmd_index(argc int, args []string, rose *Petal) ([]string, int) {
 		v := rose.print_indexes()
 		return v, 0
 	} else {
-		e, m  := make_index(args[0], rose)
+		e, m  := make_index(args[0], args[0], rose)
 		if m != "" {
 			return strv(m), e
 		} else {
@@ -140,6 +140,24 @@ func cmd_interactive(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func cmd_lookup(argc int, args []string, rose *Petal) ([]string, int) {
+	return none, 0
+}
+
+func cmd_map(argc int, args []string, rose *Petal) ([]string, int) {
+	c := rose.base
+	if c == nil {
+		if rose.message {
+			fmt.Fprintln(rose.wr, "no corpus")
+		}
+		return strv("no corpus"), 1
+	}
+	m := c.coord(args[0], rose)
+	if m != "" {
+		if rose.message {
+			fmt.Fprintln(rose.wr, m)
+		}
+		return strv(m), 1
+	}
 	return none, 0
 }
 
