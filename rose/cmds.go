@@ -151,12 +151,22 @@ func cmd_map(argc int, args []string, rose *Petal) ([]string, int) {
 		}
 		return strv("no corpus"), 1
 	}
-	m := c.coord(args[0], rose)
-	if m != "" {
-		if rose.message {
-			fmt.Fprintln(rose.wr, m)
+	if len(args) == 0 {
+		if c.coordm == nil {
+			if rose.message {
+				fmt.Fprintln(rose.wr, "no map")
+			}
+			return strv("no map"), 1
 		}
-		return strv(m), 1
+		c.coordm.Print()
+	} else {
+		m := c.coord(args[0], rose)
+		if m != "" {
+			if rose.message {
+				fmt.Fprintln(rose.wr, m)
+			}
+			return strv(m), 1
+		}
 	}
 	return none, 0
 }
