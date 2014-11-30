@@ -6,93 +6,93 @@ import (
 )
 
 var (
-	pcacheq	chan *pcreq
-	pstamp	uint64
-	pmakers	[pMax]pmaker = [pMax]pmaker {
-		pDj:	make_pdata,
-		pDn:	make_pdata,
-		pDr:	make_pdata,
-		pDv:	make_pdata,
-		pIj:	make_pindex,
-		pIn:	make_pindex,
-		pIr:	make_pindex,
-		pIv:	make_pindex,
+	pcacheq chan *pcreq
+	pstamp  uint64
+	pmakers [pMax]pmaker = [pMax]pmaker{
+		pDj: make_pdata,
+		pDn: make_pdata,
+		pDr: make_pdata,
+		pDv: make_pdata,
+		pIj: make_pindex,
+		pIn: make_pindex,
+		pIr: make_pindex,
+		pIv: make_pindex,
 	}
 )
 
 const (
-	plimit	= 1024 * 1024
+	plimit = 1024 * 1024
 
-	pcget	= iota
+	pcget = iota
 	pcput
 )
 
 type pcreq struct {
-	corpus	*corpus
-	resp	chan(*pcache)
+	corpus *corpus
+	resp   chan (*pcache)
 }
 
 type pkreq struct {
-	cmd	int
-	key	string
-	value	part
-	resp	chan(part)
+	cmd   int
+	key   string
+	value part
+	resp  chan (part)
 }
 
 type pmaker func(partc, []byte, *Petal) part
 
 type pcachev struct {
-	cmap	map[string]*pentry
-	queue	*pindexpq
-	count	int
-	pkq	chan *pkreq
+	cmap  map[string]*pentry
+	queue *pindexpq
+	count int
+	pkq   chan *pkreq
 }
 
 type pcache struct {
-	caches	[]*pcachev
+	caches []*pcachev
 }
 
 type pentry struct {
-	key	string
-	epart	part
-	stamp	uint64
-	index	int
+	key   string
+	epart part
+	stamp uint64
+	index int
 }
 
 type pindexpq []*pentry
 
 type dptr struct {
-	tag	psd
-	pos	partd
-	index	uint32
-	ptr	uint32
+	tag   psd
+	pos   partd
+	index uint32
+	ptr   uint32
 }
 
 type dframe struct {
-	kind	byte
-	xword	int
-	nwords	int
+	kind   byte
+	xword  int
+	nwords int
 }
 
 type pdata struct {
-	value	[]byte
-	error	string
-	lex	int
-	pos	partd
-	ptroz	byte
-	words	[]string
-	ptrs	[]*dptr
-	ptrp	[]part
-	rec	int
-	frames	[]*dframe
-	extra	[]string
+	value  []byte
+	error  string
+	lex    int
+	pos    partd
+	ptroz  byte
+	words  []string
+	ptrs   []*dptr
+	ptrp   []part
+	rec    int
+	frames []*dframe
+	extra  []string
 }
 
 func make_dptr(v []string, m map[string]psd, rose *Petal) *dptr {
 	d := new(dptr)
 	t := m[v[0]]
 	if t == dNone && verbose {
-		fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[0]) 
+		fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[0])
 	}
 	d.tag = t
 	s := v[2][0]
@@ -202,7 +202,7 @@ func make_pdata(c partc, b []byte, rose *Petal) part {
 	p.pos = ps
 	wc := str_int(v[2])
 	x := 3
-	if x + 2 * wc + 1 >= l {
+	if x+2*wc+1 >= l {
 		p.error = "index too short for words"
 		return p
 	}
@@ -214,7 +214,7 @@ func make_pdata(c partc, b []byte, rose *Petal) part {
 	p.words = w
 	pc := str_int(v[x])
 	x++
-	if x + 4 * pc >= l {
+	if x+4*pc >= l {
 		p.error = "index too short for pointers"
 		return p
 	}
@@ -235,7 +235,7 @@ func make_pdata(c partc, b []byte, rose *Petal) part {
 		m := psdmv[c]
 		fc := str_int(v[x])
 		x++
-		if x + 3*fc >= l {
+		if x+3*fc >= l {
 			p.error = "index too short for frames"
 		}
 		fs := make([]*dframe, fc, fc)
@@ -260,13 +260,13 @@ func make_pdata(c partc, b []byte, rose *Petal) part {
 }
 
 type pindex struct {
-	value	[]byte
-	error	string
-	pos	partd
-	pvect	[]psd
-	sensez	int
-	senses	[]uint32
-	sensep	[]part
+	value  []byte
+	error  string
+	pos    partd
+	pvect  []psd
+	sensez int
+	senses []uint32
+	sensep []part
 }
 
 func (p *pindex) Content() []byte {
@@ -311,7 +311,7 @@ func (p *pindex) Populate(r int, rose *Petal) ([]string, int) {
 				t.Populate(r, rose)
 			}
 		}
-			
+
 	}
 	return mesgs, errs
 }
@@ -330,7 +330,7 @@ func make_pindex(c partc, b []byte, rose *Petal) part {
 	p.value = b
 	v := smash_cmd(string(b))
 	l := len(v)
-	if l < 3 + 2 {
+	if l < 3+2 {
 		p.error = "short index"
 		return p
 	}
@@ -353,7 +353,7 @@ func make_pindex(c partc, b []byte, rose *Petal) part {
 	for i := 0; i < pz; i++ {
 		t := m[v[3+i]]
 		if t == dNone && verbose {
-			fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[3+i]) 
+			fmt.Fprintf(rose.wr, "unknown psd: %#q\n", v[3+i])
 		}
 		pv[i] = t
 	}
@@ -381,7 +381,7 @@ func part_get(p string, s string, rose *Petal) (part, string, int) {
 	}
 	make_pcache(c)
 	k := c.pcaches.caches[q]
-	if k == nil  {
+	if k == nil {
 		return nil, "no part maker for " + p, 1
 	}
 	r := k.get(s)
@@ -389,7 +389,7 @@ func part_get(p string, s string, rose *Petal) (part, string, int) {
 		return r, "", 0
 	}
 	b := fetch_getx(c.parts[q], s)
-	if b == nil  {
+	if b == nil {
 		return nil, s + ": not found", 1
 	}
 	r = pmakers[q](q, b, rose)
@@ -399,7 +399,7 @@ func part_get(p string, s string, rose *Petal) (part, string, int) {
 
 func pcachesrv() {
 	for {
-		req := <- pcacheq
+		req := <-pcacheq
 		if req.corpus.pcaches != nil {
 			req.resp <- req.corpus.pcaches
 		} else {
@@ -414,7 +414,7 @@ func make_pcache(c *corpus) {
 		req.corpus = c
 		req.resp = make(chan *pcache)
 		pcacheq <- req
-		p := <- req.resp
+		p := <-req.resp
 		c.pcaches = p
 	}
 }
@@ -448,7 +448,7 @@ func (c *pcache) put(s string, p partc, v part) {
 
 func (c *pcachev) pcsrv() {
 	for {
-		req := <- c.pkq
+		req := <-c.pkq
 		if req.cmd == pcget {
 			req.resp <- c.getx(req.key)
 		} else {
@@ -463,7 +463,7 @@ func (c *pcachev) get(s string) part {
 	req.key = s
 	req.resp = make(chan part)
 	c.pkq <- req
-	return <- req.resp
+	return <-req.resp
 }
 
 func (c *pcachev) put(s string, p part) {

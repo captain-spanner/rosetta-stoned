@@ -7,37 +7,37 @@ import (
 )
 
 type Petal struct {
-	name		string
-	rd		io.Reader
-	wr		io.Writer
-	ewr		io.Writer
-	base		*corpus
-	message		bool
-	verbose		bool
-	xeq		bool
-	interactive	bool
-	prompt		string
+	name        string
+	rd          io.Reader
+	wr          io.Writer
+	ewr         io.Writer
+	base        *corpus
+	message     bool
+	verbose     bool
+	xeq         bool
+	interactive bool
+	prompt      string
 }
 
 type petalreq struct {
-	rose	*Petal
-	mesg	chan string
+	rose *Petal
+	mesg chan string
 }
 
 type runreq struct {
-	rose	*Petal
-	args	[]string
-	resp	chan *runresp
+	rose *Petal
+	args []string
+	resp chan *runresp
 }
 
 type runresp struct {
-	mesgs	[]string
-	errs	int
+	mesgs []string
+	errs  int
 }
 
 var (
-	petalq	chan *petalreq
-	runq	chan *runreq
+	petalq chan *petalreq
+	runq   chan *runreq
 )
 
 func MkPetal(name string, rd io.Reader, wr io.Writer, ewr io.Writer, proto *Petal) *Petal {
@@ -64,12 +64,12 @@ func (p *Petal) XeqPetal() string {
 	req.rose = p
 	req.mesg = make(chan string)
 	petalq <- req
-	return <- req.mesg
+	return <-req.mesg
 }
 
 func petalsrv() {
 	for {
-		req := <- petalq
+		req := <-petalq
 		go petalrun(req)
 	}
 }
@@ -83,7 +83,7 @@ func petalrun(req *petalreq) {
 		}
 		line, err := r.ReadString('\n')
 		// fix
-		if err != nil || (len(line) >=4 && line[0:4] == "quit") {
+		if err != nil || (len(line) >= 4 && line[0:4] == "quit") {
 			break
 		}
 		run_cmd(line, rose)
@@ -93,7 +93,7 @@ func petalrun(req *petalreq) {
 
 func runsrv() {
 	for {
-		req := <- runq
+		req := <-runq
 		go runslave(req)
 	}
 }
@@ -112,6 +112,6 @@ func (rose *Petal) run(args []string) ([]string, int) {
 	req.args = args
 	req.resp = make(chan *runresp)
 	runq <- req
-	resp := <- req.resp
+	resp := <-req.resp
 	return resp.mesgs, resp.errs
 }

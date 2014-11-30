@@ -53,7 +53,7 @@ func cmd_bool(name string, argc int, args []string, vp *bool, rose *Petal) ([]st
 }
 
 func cmd_collection(argc int, args []string, rose *Petal) ([]string, int) {
-	e, m  := make_collection(args[0], rose)
+	e, m := make_collection(args[0], rose)
 	if m != "" {
 		return strv(m), e
 	} else {
@@ -67,7 +67,7 @@ func cmd_corpi(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func cmd_corpus(argc int, args []string, rose *Petal) ([]string, int) {
-	e, m  := rose.make_corpus(args[0])
+	e, m := rose.make_corpus(args[0])
 	if m != "" {
 		return strv(m), e
 	} else {
@@ -81,7 +81,7 @@ func cmd_debug(argc int, args []string, rose *Petal) ([]string, int) {
 }
 
 func cmd_echo(argc int, args []string, rose *Petal) ([]string, int) {
-	e := "";
+	e := ""
 	for i, s := range args {
 		if i == 0 {
 			e = s
@@ -125,7 +125,7 @@ func cmd_index(argc int, args []string, rose *Petal) ([]string, int) {
 		v := rose.print_indexes()
 		return v, 0
 	} else {
-		e, m  := make_index(args[0], args[0], rose)
+		e, m := make_index(args[0], args[0], rose)
 		if m != "" {
 			return strv(m), e
 		} else {
@@ -267,7 +267,7 @@ func cmd_run(argc int, args []string, rose *Petal) ([]string, int) {
 		}
 		return strv(d), 1
 	}
-	p := MkPetal("File: " + n, f, nil, nil, rose)
+	p := MkPetal("File: "+n, f, nil, nil, rose)
 	p.interactive = false
 	p.XeqPetal()
 	if p.base != rose.base {

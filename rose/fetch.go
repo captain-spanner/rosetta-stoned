@@ -6,7 +6,7 @@ import (
 
 var (
 	fetchtv []fetchf = []fetchf{
-		hFsRec:    fetch_null,
+		hFsRec:   fetch_null,
 		hHashed:  fetch_hashed,
 		hIndexed: fetch_indexed,
 		hLiteral: fetch_literal,

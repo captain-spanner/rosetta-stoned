@@ -6,13 +6,13 @@ import (
 )
 
 var (
-	indexm	map[string]*index = make(map[string]*index)
-	indexv	[]*index = make([]*index , 0, 0)
-	indexr	map[string]string = make(map[string]string)
-	corpi	[]*corpus = make([]*corpus , 0, 0)
-	corpn	map[string]*corpus = make(map[string]*corpus)
-	addixq	chan *index
-	addcorq	chan *corpus
+	indexm  map[string]*index  = make(map[string]*index)
+	indexv  []*index           = make([]*index, 0, 0)
+	indexr  map[string]string  = make(map[string]string)
+	corpi   []*corpus          = make([]*corpus, 0, 0)
+	corpn   map[string]*corpus = make(map[string]*corpus)
+	addixq  chan *index
+	addcorq chan *corpus
 )
 
 const (
@@ -28,26 +28,26 @@ type part interface {
 }
 
 type index struct {
-	name	string
-	file	string
-	path	string
-	count	int
-	date	string
-	format	string
-	hash	hashc
-	arg	int
-	argx	int
-	imap	[]byte
-	imapz	int
-	cache	indexer
-	fetch	fetchf
-	words	map[string]bool
-	ok	bool
+	name   string
+	file   string
+	path   string
+	count  int
+	date   string
+	format string
+	hash   hashc
+	arg    int
+	argx   int
+	imap   []byte
+	imapz  int
+	cache  indexer
+	fetch  fetchf
+	words  map[string]bool
+	ok     bool
 }
 
 func addixsrv() {
 	for {
-		ix := <- addixq
+		ix := <-addixq
 		s := ix.name
 		if indexm[s] != nil {
 			continue
@@ -245,16 +245,16 @@ func (rose *Petal) make_corpus(s string) (int, string) {
 		if c != pNone {
 			d[c] = indexm[p]
 			pf := parts[c]
-			indexr[s + "." + pf] = p
-/*
-			if isbase {
-				indexr[pf] = p
-			}
-*/
+			indexr[s+"."+pf] = p
+			/*
+				if isbase {
+					indexr[pf] = p
+				}
+			*/
 		}
 	}
 	c.parts = d
-	addcorq	<- c
+	addcorq <- c
 	if rose.base == nil {
 		rose.base = c
 	}

@@ -3,19 +3,19 @@ package rose
 import (
 	"fmt"
 	"fsrec"
-//	"io/ioutil"
+	//	"io/ioutil"
 )
 
 type corpus struct {
-	name	string
-	parts	[]*index
-	pcaches	*pcache
+	name    string
+	parts   []*index
+	pcaches *pcache
 	coordm  *fsrec.Fsrec
 }
 
 func addcorsrv() {
 	for {
-		c := <- addcorq
+		c := <-addcorq
 		if corpn[c.name] != nil {
 			continue
 		}
