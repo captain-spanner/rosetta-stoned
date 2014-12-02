@@ -48,3 +48,17 @@ func (c *corpus) coord(n string, rose *Petal) string {
 	c.coordm = fs
 	return ""
 }
+
+func (c *corpus) parsecoord(s string) (x float64, y float64, p bool) {
+	z := c.coordm.KeySize()
+	x, y, p = 0., 0., true
+	if s[z+1] == 'U' {
+		return
+	}
+	r, err := fmt.Sscanf(s[z:], " %f %f", &y, &x)
+	if r != 2 || err != nil {
+		return
+	}
+	p = false
+	return
+}

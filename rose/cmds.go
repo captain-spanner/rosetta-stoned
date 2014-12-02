@@ -78,10 +78,20 @@ func cmd_coord(argc int, args []string, rose *Petal) ([]string, int) {
 	}
 	m, r := fs.Searchc(args[0])
 	if r {
-		return strv(m), 1
-	} else {
-		fmt.Fprintln(rose.wr, "%s", m)
+		if rose.verbose {
+			fmt.Fprint(rose.wr, m)
+		}
+		if rose.message {
+			x, y, p := c.parsecoord(m)
+			if p {
+				fmt.Fprintln(rose.wr, "pirate")
+			} else {
+				fmt.Fprintf(rose.wr, "where %f %f\n", x, y)
+			}
+		}
 		return none, 0
+	} else {
+		return strv(m), 1
 	}
 }
 

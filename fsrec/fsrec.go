@@ -81,3 +81,7 @@ func (fs *Fsrec) Searchc(s string) (string, bool) {
 func (fs *Fsrec) geq(n int, k []byte) bool {
 	return bytes.Compare(fs.GetRec(n)[:fs.keysz], k) >= 0
 }
+
+func (fs *Fsrec) KeySize() int {
+	return fs.keysz
+}
