@@ -76,10 +76,11 @@ func cmd_coord(argc int, args []string, rose *Petal) ([]string, int) {
 		}
 		return strv("no map"), 1
 	}
-	m, _ := fs.Searchc(args[0])
-	if m != "" {
+	m, r := fs.Searchc(args[0])
+	if r {
 		return strv(m), 1
 	} else {
+		fmt.Fprintln(rose.wr, "%s", m)
 		return none, 0
 	}
 }
