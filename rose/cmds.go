@@ -76,23 +76,25 @@ func cmd_coord(argc int, args []string, rose *Petal) ([]string, int) {
 		}
 		return strv("no map"), 1
 	}
-	m, r := fs.Searchc(args[0])
-	if r {
-		if rose.verbose {
-			fmt.Fprint(rose.wr, m)
-		}
-		if rose.message {
-			x, y, p := c.parsecoord(m)
-			if p {
-				fmt.Fprintln(rose.wr, "pirate")
-			} else {
-				fmt.Fprintf(rose.wr, "where %f %f\n", x, y)
+	for _, v := range args {
+		m, r := fs.Searchc(v)
+		if r {
+			if rose.verbose {
+				fmt.Fprint(rose.wr, m)
 			}
+			if rose.message {
+				x, y, p := c.parsecoord(m)
+				if p {
+					fmt.Fprintln(rose.wr, "pirate")
+				} else {
+					fmt.Fprintf(rose.wr, "where %f %f\n", x, y)
+				}
+			}
+		} else {
+			return strv(m), 1
 		}
-		return none, 0
-	} else {
-		return strv(m), 1
 	}
+	return none, 0
 }
 
 func cmd_corpi(argc int, args []string, rose *Petal) ([]string, int) {
