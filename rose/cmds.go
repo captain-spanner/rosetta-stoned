@@ -61,6 +61,29 @@ func cmd_collection(argc int, args []string, rose *Petal) ([]string, int) {
 	}
 }
 
+func cmd_coord(argc int, args []string, rose *Petal) ([]string, int) {
+	c := rose.base
+	if c == nil {
+		if rose.message {
+			fmt.Fprintln(rose.wr, "no corpus")
+		}
+		return strv("no corpus"), 1
+	}
+	fs := c.coordm
+	if fs == nil {
+		if rose.message {
+			fmt.Fprintln(rose.wr, "no map")
+		}
+		return strv("no map"), 1
+	}
+	m, _ := fs.Searchc(args[0])
+	if m != "" {
+		return strv(m), 1
+	} else {
+		return none, 0
+	}
+}
+
 func cmd_corpi(argc int, args []string, rose *Petal) ([]string, int) {
 	rose.print_corpi()
 	return none, 0
@@ -129,7 +152,7 @@ func cmd_index(argc int, args []string, rose *Petal) ([]string, int) {
 		if m != "" {
 			return strv(m), e
 		} else {
-			return none, e
+			return none, 0
 		}
 	}
 }

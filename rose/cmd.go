@@ -29,6 +29,7 @@ func init_cmds() {
 		"#":    {cmd_comment, 0, -1, "# comment until end of line", "comment"},
 		"//":   {cmd_comment, 0, -1, "// comment until end of line", "comment"},
 		"base": {cmd_base, 0, 1, "base <name>", "set base corpus"}, "collection": {cmd_collection, 1, 1, "collection [ <name> ]", "manage collections"},
+		"coord":       {cmd_coord, 1, 1, "coord", "map noun index to coords"},
 		"corpi":       {cmd_corpi, 0, 0, "corpi", "list corpi"},
 		"corpus":      {cmd_corpus, 1, 1, "corpus <name>", "add corpus"},
 		"debug":       {cmd_debug, 0, 1, "debug [ <bool> ]", "manage debug"},
