@@ -2,6 +2,7 @@ package rose
 
 import (
 	"fmt"
+	"strings"
 )
 
 // Commands
@@ -343,10 +344,8 @@ func cmd_where(argc int, args []string, rose *Petal) ([]string, int) {
 			fmt.Fprintf(rose.wr, "%s\n", s)
 		}
 		if rose.message {
-			fmt.Fprintf(rose.wr, "%s\n", s[11:31])
+			fmt.Fprintf(rose.wr, "%s\n", strings.TrimSpace(s[11:31]))
 		}
-	} else if rose.message {
-		fmt.Fprintf(rose.wr, "%d\n", n)
 	}
 	return nil, 0
 }
