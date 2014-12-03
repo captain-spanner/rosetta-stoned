@@ -324,10 +324,10 @@ func cmd_where(argc int, args []string, rose *Petal) ([]string, int) {
 	if r {
 		x, r = floatarg(args[1])
 		if !r {
-			m = "lattitude"
+			m = "longitude"
 		}
 	} else {
-		m = "longitude"
+		m = "lattitude"
 	}
 	if m != "" {
 		if rose.message {
