@@ -48,6 +48,7 @@ func init_cmds() {
 		"root":        {cmd_root, 1, 1, "root <directory>", "set root"},
 		"run":         {cmd_run, 1, 1, "run <file>", "run commands from a file"},
 		"verbose":     {cmd_verbose, 0, 1, "verbose [ <bool> ]", "manage verbose"},
+		"where":       {cmd_where, 2, 2, "where <long> <lat>", "map cooord to position"},
 		"word":        {cmd_word, 1, 1, "word <word>", "find word in indexed wordlists"},
 		"xeq":         {cmd_xeq, 0, 1, "xeq [ <bool> ]", "manage xeq"},
 	}

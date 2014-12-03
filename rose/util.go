@@ -2,13 +2,13 @@ package rose
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
-	"os"
 )
 
 var (
-	newline []byte = []byte { '\n' }
+	newline []byte = []byte{'\n'}
 )
 
 func fatal(src string, ix int, mesg string) {
@@ -68,7 +68,7 @@ func smash_cmd(s string) []string {
 }
 
 func strv(s string) []string {
-	r := make([]string , 1, 1)
+	r := make([]string, 1, 1)
 	r[0] = s
 	return r
 }
@@ -181,4 +181,13 @@ func uints_strz(v []uint32, z int) string {
 		s += " " + uint_strz(u, z)
 	}
 	return s
+}
+
+func floatarg(s string) (float64, bool) {
+	var f float64
+	r, e := fmt.Sscanf(s, "%f", &f)
+	if r != 1 || e != nil {
+		return 0., false
+	}
+	return f, true
 }

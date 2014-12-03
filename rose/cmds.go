@@ -317,6 +317,31 @@ func cmd_verbose(argc int, args []string, rose *Petal) ([]string, int) {
 	return m, e
 }
 
+func cmd_where(argc int, args []string, rose *Petal) ([]string, int) {
+	m := ""
+	y, r := floatarg(args[0])
+	var x float64
+	if r {
+		x, r = floatarg(args[1])
+		if !r {
+			m = "lattitude"
+		}
+	} else {
+		m = "longitude"
+	}
+	if m != "" {
+		if rose.message {
+			fmt.Fprintf(rose.wr, "%s: parse error\n", m)
+		}
+		return strv(m), 1
+	}
+	n := regfile.Wherexy(x, y)
+	if rose.message {
+		fmt.Fprintf(rose.wr, "%d\n", n)
+	}
+	return nil, 0
+}
+
 func cmd_word(argc int, args []string, rose *Petal) ([]string, int) {
 	rose.list_ixword(args[0])
 	return nil, 0
