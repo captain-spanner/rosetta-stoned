@@ -336,7 +336,16 @@ func cmd_where(argc int, args []string, rose *Petal) ([]string, int) {
 		return strv(m), 1
 	}
 	n := regfile.Wherexy(x, y)
-	if rose.message {
+	b := regfile.Getrec(n)
+	if b != nil {
+		s := string(b)
+		if rose.verbose {
+			fmt.Fprintf(rose.wr, "%s\n", s)
+		}
+		if rose.message {
+			fmt.Fprintf(rose.wr, "%s\n", s[11:31])
+		}
+	} else if rose.message {
 		fmt.Fprintf(rose.wr, "%d\n", n)
 	}
 	return nil, 0
