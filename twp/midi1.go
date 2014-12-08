@@ -41,16 +41,14 @@ func main() {
 	b.scales()
 	a.trail()
 	b.trail()
-	fmt.Printf("-- a: bits = %d, tail = %d\n", a.bits, a.tail)
-	fmt.Printf("-- b: bits = %d, tail = %d\n", b.bits, b.tail)
+	fmt.Printf("-- a: bits = %d, tail = %d\r\n", a.bits, a.tail)
+	fmt.Printf("-- b: bits = %d, tail = %d\r\n", b.bits, b.tail)
 	a.split()
 	b.split()
 	m := a.deftype(0)
 	b.deftype(m)
-/*
 	a.mkvhh()
 	b.mkvhh()
-*/
 }
 
 // 2^((m-69)/12)*(440 Hz)
@@ -104,7 +102,7 @@ func (t *table) trail() {
 func (t *table) split() {
 	t.head = t.bits - t.tail
 	s := uint32(t.tail)
-	m := uint32(1 << s)
+	m := uint32(1 << s) - 1
 	for i, v := range t.scale {
 		top := v >> s
 		low := v & m
@@ -143,18 +141,28 @@ func deftype(z, m int) int {
 	return m
 }
 
-func (t *table) binary(v uint32) string {
-	s := fmt.Sprintf("%%0%db", t.bits)
+func binary(v uint32, b int) string {
+	s := fmt.Sprintf("%%0%db", b)
 	return fmt.Sprintf(s, v)
 }
 
 func (t *table) mkvhh() {
+	mkvhh(t.top[:], t.head, t.sr, "head")
+	mkvhh(t.low[:], t.tail, t.sr, "low0")
+	mkvhh(t.low2[:], t.tail-1, t.sr, "low1")
+}
+
+func mkvhh(tab []uint32, b int, sr float64, tag string) {
+	m := 3
+	if b < 8 {
+		m = 7
+	}
 	fmt.Printf("\r\n")
-	fmt.Printf("\tconstant %s%d: %s%d :=\r\n", pref, int(t.sr), pref, t.bits)
+	fmt.Printf("\tconstant %s%d_%s: %s%d :=\r\n", pref, uint(sr), tag, pref, b)
 	fmt.Printf("\t(\r\n")
 	for i, s := 0, "\t\t"; i < RANGE; i++ {
-		fmt.Printf("%s\"%s\"", s, t.binary(t.scale[i]))
-		if (i & 3) == 3 {
+		fmt.Printf("%s\"%s\"", s, binary(tab[i], b))
+		if (i & m) == m {
 			s = ",\r\n\t\t"
 		} else {
 			s = ", "
