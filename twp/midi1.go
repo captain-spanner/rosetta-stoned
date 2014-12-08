@@ -27,6 +27,7 @@ type table struct {
 	low   [RANGE]uint32
 	low2  [RANGE]uint32
 	bits  int
+	head  int
 	tail  int
 }
 
@@ -40,13 +41,13 @@ func main() {
 	b.scales()
 	a.trail()
 	b.trail()
-	fmt.Printf("a: bits = %d, tail = %d\n", a.bits, a.tail)
-	fmt.Printf("b: bits = %d, tail = %d\n", a.bits, a.tail)
+	fmt.Printf("-- a: bits = %d, tail = %d\n", a.bits, a.tail)
+	fmt.Printf("-- b: bits = %d, tail = %d\n", b.bits, b.tail)
 	a.split()
 	b.split()
-/*
 	m := a.deftype(0)
 	b.deftype(m)
+/*
 	a.mkvhh()
 	b.mkvhh()
 */
@@ -101,6 +102,7 @@ func (t *table) trail() {
 }
 
 func (t *table) split() {
+	t.head = t.bits - t.tail
 	s := uint32(t.tail)
 	m := uint32(1 << s)
 	for i, v := range t.scale {
@@ -124,12 +126,19 @@ func bits(v uint32) int {
 }
 
 func (t *table) deftype(m int) int {
-	b := 1 << uint(t.bits)
+	m = deftype(t.head, m)
+	m = deftype(t.tail, m)
+	m = deftype(t.tail-1, m)
+	return m
+}
+
+func deftype(z, m int) int {
+	b := 1 << uint(z)
 	if b&m != 0 {
 		return m
 	}
-	fmt.Printf("\ttype %s%d is array(0 to %d)\r\n", pref, t.bits, RANGE-1)
-	fmt.Printf("\t\tof std_logic_vector(%d downto 0);\r\n", t.bits-1)
+	fmt.Printf("\ttype %s%d is array(0 to %d)\r\n", pref, z, RANGE-1)
+	fmt.Printf("\t\tof std_logic_vector(%d downto 0);\r\n", z-1)
 	m |= b
 	return m
 }
