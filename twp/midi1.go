@@ -96,7 +96,7 @@ func (t *table) trail() {
 			max = j
 		}
 	}
-	t.tail = int(max)
+	t.tail = int(max) + 1
 }
 
 func (t *table) split() {

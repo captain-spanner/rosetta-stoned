@@ -57,9 +57,7 @@ func (t *table) process() {
 	fmt.Printf("-- %c: bits = %d, tail = %d, ham = %t\r\n", t.tc, t.bits, t.tail, t.ham)
 	t.split()
 	t.deftype()
-/*
 	t.mkvhh()
-*/
 }
 
 // 2^((m-69)/12)*(440 Hz)
@@ -170,9 +168,13 @@ func binary(v uint32, b int) string {
 }
 
 func (t *table) mkvhh() {
-	mkvhh(t.top[:], t.head, t.sr, "head")
-	mkvhh(t.low[:], t.tail, t.sr, "low0")
-	mkvhh(t.low2[:], t.tail-1, t.sr, "low1")
+	if t.ham {
+		mkvhh(t.scale[:], t.bits, t.sr, "ham")
+	} else {
+		mkvhh(t.top[:], t.head, t.sr, "head")
+		mkvhh(t.low[:], t.tail, t.sr, "low0")
+		mkvhh(t.low2[:], t.tail-1, t.sr, "low1")
+	}
 }
 
 func mkvhh(tab []uint32, b int, sr float64, tag string) {
